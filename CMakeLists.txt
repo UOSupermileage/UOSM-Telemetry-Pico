@@ -22,6 +22,7 @@ include_directories(
         UOSM-Core/Inc
         UOSM-Core/Modules
         UOSM-Core/Utils
+        ${PICO_SDK_PATH}/lib/mbedtls/include
 )
 
 file(GLOB SOURCES
@@ -38,6 +39,8 @@ file(GLOB UOSM_CORE_SOURCES
 
 add_executable(UOSM_Telemetry_Pico ${SOURCES} ${UOSM_CORE_SOURCES})
 
+target_compile_definitions(UOSM_Telemetry_Pico PUBLIC MQTT_USE_MBEDTLS)
+
 # Link against the SDK
 target_link_libraries(UOSM_Telemetry_Pico
         pico_stdlib
@@ -45,6 +48,11 @@ target_link_libraries(UOSM_Telemetry_Pico
         hardware_gpio
         FreeRTOS-Kernel
         FreeRTOS-Kernel-Heap4
+        pico_lwip
+        pico_lwip_mbedtls
+        pico_lwip_api
+        pico_lwip_arch
+        pico_lwip_mqtt
 )
 
 # Enable printf stdout to USB
