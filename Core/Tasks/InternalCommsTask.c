@@ -1,4 +1,3 @@
-#include <sys/cdefs.h>
 //
 // Created by Jeremy Cote on 2024-07-21.
 //
@@ -8,7 +7,7 @@
 #include "ApplicationTypes.h"
 #include "CANDriver.h"
 #include "InternalCommsModule.h"
-
+#include "RTOS.h"
 #include <FreeRTOS.h>
 #include <task.h>
 
@@ -33,7 +32,7 @@ void InitInternalCommsTask() {
             "iComms",
             ICOMMS_STACK_SIZE,
             (void*) NULL,
-            tskIDLE_PRIORITY,
+            TASK_MEDIUM_PRIORITY,
             InternalCommsTaskStack,
             &InternalCommsTaskBuffer
     );

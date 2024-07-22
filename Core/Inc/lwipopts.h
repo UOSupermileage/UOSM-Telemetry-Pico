@@ -25,6 +25,10 @@
 #define MEM_LIBC_MALLOC             0
 #endif
 
+#define LWIP_ALTCP                   1
+#define LWIP_ALTCP_TLS               1
+#define LWIP_ALTCP_TLS_MBEDTLS       1
+
 #define MEM_ALIGNMENT               4
 #define MEM_SIZE                    4000
 #define MEMP_NUM_TCP_SEG            32

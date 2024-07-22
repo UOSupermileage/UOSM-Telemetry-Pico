@@ -6,7 +6,7 @@
 
 #include <FreeRTOS.h>
 #include <task.h>
-
+#include "RTOS.h"
 #include <hardware/gpio.h>
 
 #include "Sleep.h"
@@ -30,7 +30,7 @@ void InitStatusTask() {
             "status",
             STACK_SIZE,
             (void*) NULL,
-            tskIDLE_PRIORITY,
+            TASK_LOW_PRIORITY,
             StatusTaskStack,
             &StatusTaskBuffer
     );

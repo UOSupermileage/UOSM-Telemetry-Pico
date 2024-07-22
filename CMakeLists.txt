@@ -40,6 +40,7 @@ file(GLOB UOSM_CORE_SOURCES
 add_executable(UOSM_Telemetry_Pico ${SOURCES} ${UOSM_CORE_SOURCES})
 
 target_compile_definitions(UOSM_Telemetry_Pico PUBLIC MQTT_USE_MBEDTLS)
+target_compile_options(UOSM_Telemetry_Pico PRIVATE -Wno-unused-result)
 
 # Link against the SDK
 target_link_libraries(UOSM_Telemetry_Pico
