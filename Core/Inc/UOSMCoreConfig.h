@@ -8,10 +8,14 @@
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
 
-#define MAX_SERIAL_PRINT_LENGTH 128
-
 #define SPI spi0
+
+#define SPI_BAUDRATE 1000000
+
 #define SPI_CS 0
+#define SPI_MISO 1
+#define SPI_MOSI 2
+#define SPI_CLK 3
 
 #define MCP2515_SPI_TRANSMIT(BUFFER, SIZE)    spi_write_blocking(SPI, BUFFER, SIZE)
 #define MCP2515_SPI_RECEIVE(BUFFER, SIZE)     spi_read_blocking(SPI, 0, BUFFER, SIZE)

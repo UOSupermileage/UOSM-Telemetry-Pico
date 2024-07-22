@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
 
-#set(CMAKE_CXX_STANDARD 17)
-#set(CMAKE_C_STANDARD 23)
-
 set(ENV{PICO_SDK_PATH} ${CMAKE_SOURCE_DIR}/pico-sdk)
 set(ENV{FREERTOS_KERNEL_PATH} ${CMAKE_SOURCE_DIR}/FreeRTOS-Kernel)
 
@@ -18,11 +15,19 @@ project(UOSM_Telemetry_Pico C CXX ASM)
 pico_sdk_init()
 
 include_directories(
-        include
+        Core/Inc
+        Core/Tasks
+        Core/UserDrivers
         UOSM-Core/Drivers
         UOSM-Core/Inc
         UOSM-Core/Modules
         UOSM-Core/Utils
+)
+
+file(GLOB SOURCES
+        Core/Src/*.c
+        Core/Tasks/*.c
+        Core/UserDrivers/*.c
 )
 
 file(GLOB UOSM_CORE_SOURCES
@@ -31,7 +36,7 @@ file(GLOB UOSM_CORE_SOURCES
         UOSM-Core/Utils/*.cpp
 )
 
-add_executable(UOSM_Telemetry_Pico main.c ${UOSM_CORE_SOURCES})
+add_executable(UOSM_Telemetry_Pico ${SOURCES} ${UOSM_CORE_SOURCES})
 
 # Link against the SDK
 target_link_libraries(UOSM_Telemetry_Pico
