@@ -10,6 +10,7 @@
 #include <hardware/gpio.h>
 
 #include "Sleep.h"
+#include "ApplicationTypes.h"
 
 #define BLINK_RATE 1000
 

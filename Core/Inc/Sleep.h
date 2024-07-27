@@ -8,6 +8,6 @@
 /**
  * Sleep for specified number of milliseconds
  */
-#define Sleep(ms) (ms / portTICK_PERIOD_MS)
+#define Sleep(ms) vTaskDelay(pdMS_TO_TICKS(ms))
 
 #endif //UOSM_TELEMETRY_PICO_SLEEP_H

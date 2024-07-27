@@ -1,4 +1,3 @@
-#include <sys/cdefs.h>
 //
 // Created by Jeremy Cote on 2024-07-21.
 //
@@ -9,13 +8,18 @@
 
 #include "InternalCommsTask.h"
 #include "StatusTask.h"
+#include "LoggingTask.h"
+#include "NetworkTask.h"
 
 #include <FreeRTOS.h>
 #include <task.h>
 
 _Noreturn void RunTaskManager(void) {
+    DebugPrint("Running Task Manager");
     InitInternalCommsTask();
     InitStatusTask();
+    InitLoggingTask();
+    InitNetworkTask();
 
     vTaskStartScheduler();
 

@@ -46,6 +46,7 @@
 #define configUSE_IDLE_HOOK                     0
 #define configUSE_TICK_HOOK                     0
 #define configTICK_RATE_HZ                      ( ( TickType_t ) 1000 )
+#define portTICK_RATE_MS portTICK_PERIOD_MS
 #define configMAX_PRIORITIES                    32
 #define configMINIMAL_STACK_SIZE                ( configSTACK_DEPTH_TYPE ) 256
 #define configUSE_16_BIT_TICKS                  0
@@ -77,12 +78,11 @@
 #define configKERNEL_PROVIDED_STATIC_MEMORY     1
 
 /* Hook function related definitions. */
-#define configCHECK_FOR_STACK_OVERFLOW          0
+#define configCHECK_FOR_STACK_OVERFLOW          1
 #define configUSE_MALLOC_FAILED_HOOK            0
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 
 /* Run time and task stats gathering related definitions. */
-#define configGENERATE_RUN_TIME_STATS           0
 #define configUSE_TRACE_FACILITY                1
 #define configUSE_STATS_FORMATTING_FUNCTIONS    0
 
@@ -138,5 +138,12 @@ to exclude the API function. */
 #define INCLUDE_xQueueGetMutexHolder            1
 
 /* A header file that defines trace macro can be included here. */
+
+// Debugging Stuff
+#define configUSE_TRACE_FACILITY 1
+#define configMAX_TASK_NAME_LEN 20
+#define configRECORD_STACK_HIGH_ADDRESS 1
+#define configUSE_TRACE_FACILITY 1
+#define configGENERATE_RUN_TIME_STATS 0
 
 #endif /* FREERTOS_CONFIG_H */

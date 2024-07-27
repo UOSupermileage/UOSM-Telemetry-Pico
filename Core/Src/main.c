@@ -1,13 +1,14 @@
-#include <stdio.h>
 #include <pico/stdlib.h>
-#include <stdarg.h>
 
 #include "hardware/spi.h"
 #include "UOSMCoreConfig.h"
-#include "InternalCommsModule.h"
-#include "CANDriver.h"
 
 #include "TaskManager.h"
+
+#include "interrupts.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "Sleep.h"
 
 bool SPI_Init() {
     spi_init(SPI, SPI_BAUDRATE);
@@ -17,12 +18,9 @@ bool SPI_Init() {
     gpio_set_function(SPI_MISO, GPIO_FUNC_SPI);
     gpio_set_function(SPI_MOSI, GPIO_FUNC_SPI);
 
-    gpio_pull_up(SPI_CLK);
-    gpio_pull_up(SPI_MISO);
-    gpio_pull_up(SPI_MOSI);
-    gpio_pull_up(SPI_CS);
-
+    gpio_init(SPI_CS);
     gpio_set_dir(SPI_CS, GPIO_OUT);
+    gpio_pull_up(SPI_CS);
     gpio_put(SPI_CS, 1);
 
     return true;
@@ -34,6 +32,13 @@ int main() {
 
     SPI_Init();
 
+    interrupts_init();
 
     RunTaskManager();
+}
+
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName ) {
+    while (true) {
+        Sleep(100);
+    }
 }

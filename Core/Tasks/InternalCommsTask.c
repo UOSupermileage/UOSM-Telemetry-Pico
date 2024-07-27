@@ -12,6 +12,7 @@
 #include <task.h>
 
 #include "Sleep.h"
+#include "data_aggregator.h"
 
 #define CAN_POLLING_RATE 100
 
@@ -52,7 +53,7 @@ _Noreturn void InternalCommsTask(void* parameters) {
 
 void ThrottleDataCallback(iCommsMessage_t *msg) {
     percentage_t throttle = (percentage_t) readMsg(msg);
-    printf("Received throttle: %d", throttle);
+    data_aggregator_set_throttle(throttle);
 }
 
 void ErrorDataCallback(iCommsMessage_t *msg) { }

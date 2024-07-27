@@ -9,8 +9,7 @@
 // (see https://www.nongnu.org/lwip/2_1_x/group__lwip__opts.html for details)
 
 #ifndef NO_SYS
-// Set to 0 to allow FreeRTOS
-#define NO_SYS                      1
+#define NO_SYS                      0
 #endif
 
 // allow override in some examples

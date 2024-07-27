@@ -1,0 +1,10 @@
+//
+// Created by Jeremy Cote on 2024-07-25.
+//
+
+#ifndef UOSM_TELEMETRY_PICO_LOGGINGTASK_H
+#define UOSM_TELEMETRY_PICO_LOGGINGTASK_H
+
+void InitLoggingTask();
+
+#endif //UOSM_TELEMETRY_PICO_LOGGINGTASK_H

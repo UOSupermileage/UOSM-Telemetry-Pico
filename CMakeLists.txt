@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.27)
 
 set(ENV{PICO_SDK_PATH} ${CMAKE_SOURCE_DIR}/pico-sdk)
 set(ENV{FREERTOS_KERNEL_PATH} ${CMAKE_SOURCE_DIR}/FreeRTOS-Kernel)
+set(ENV{FatFS_PATH} ${CMAKE_SOURCE_DIR}/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico)
 
 # Include the Pico SDK
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
@@ -13,6 +14,8 @@ project(UOSM_Telemetry_Pico C CXX ASM)
 
 # Must initialize Pico SDK before creating executable
 pico_sdk_init()
+
+add_subdirectory($ENV{FatFS_PATH}/src build)
 
 include_directories(
         Core/Inc
@@ -39,7 +42,7 @@ file(GLOB UOSM_CORE_SOURCES
 
 add_executable(UOSM_Telemetry_Pico ${SOURCES} ${UOSM_CORE_SOURCES})
 
-target_compile_definitions(UOSM_Telemetry_Pico PUBLIC MQTT_USE_MBEDTLS)
+target_compile_definitions(UOSM_Telemetry_Pico PUBLIC MQTT_USE_MBEDTLS LWIP_PROVIDE_ERRNO)
 target_compile_options(UOSM_Telemetry_Pico PRIVATE -Wno-unused-result)
 
 # Link against the SDK
@@ -52,8 +55,10 @@ target_link_libraries(UOSM_Telemetry_Pico
         pico_lwip
         pico_lwip_mbedtls
         pico_lwip_api
-        pico_lwip_arch
+        pico_lwip_freertos
         pico_lwip_mqtt
+        pico_async_context_freertos
+        no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
 )
 
 # Enable printf stdout to USB
