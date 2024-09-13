@@ -49,6 +49,7 @@ target_compile_options(UOSM_Telemetry_Pico PRIVATE -Wno-unused-result)
 target_link_libraries(UOSM_Telemetry_Pico
         pico_stdlib
         hardware_spi
+        hardware_i2c
         hardware_gpio
         FreeRTOS-Kernel
         FreeRTOS-Kernel-Heap4

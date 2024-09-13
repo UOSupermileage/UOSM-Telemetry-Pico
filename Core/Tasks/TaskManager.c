@@ -10,6 +10,7 @@
 #include "StatusTask.h"
 #include "LoggingTask.h"
 #include "NetworkTask.h"
+#include "CurrentSensorTask.h"
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -19,7 +20,8 @@ _Noreturn void RunTaskManager(void) {
     InitInternalCommsTask();
     InitStatusTask();
     InitLoggingTask();
-    InitNetworkTask();
+    InitCurrentSensorTask();
+//    InitNetworkTask();
 
     vTaskStartScheduler();
 
