@@ -58,7 +58,10 @@ void ThrottleDataCallback(iCommsMessage_t *msg) {
 
 void ErrorDataCallback(iCommsMessage_t *msg) { }
 
-void SpeedDataCallback(iCommsMessage_t *msg) { }
+void SpeedDataCallback(iCommsMessage_t *msg) {
+    percentage_t speedData = (percentage_t) readMsg(msg);
+    data_aggregator_set_speedData(speedData);
+}
 
 void EventDataCallback(iCommsMessage_t *msg) { }
 

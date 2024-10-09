@@ -90,6 +90,10 @@ _Noreturn void LoggingTask(void* parameters) {
         int len = snprintf(row, 128, "%lu,%d\n", xTaskGetTickCount(), data_aggregator_get_throttle());
         fr = f_write(&fil, row, len, &bw);
 
+
+        int lenght = snprintf(row, 128, "%lu,%d\n", xTaskGetTickCount(), data_aggregator_get_throttle());
+        fr = f_write(&fil, row, lenght, &bw);
+
         static uint8_t i;
         if (i++ % 5 == 0) {
             f_sync(&fil);
@@ -97,4 +101,6 @@ _Noreturn void LoggingTask(void* parameters) {
 
         Sleep(50);
     }
+
+    
 }
