@@ -42,11 +42,13 @@ _Noreturn void CurrentSensorTask(void* parameters) {
         Sleep(500);
     }
 
+    while (!current_sensor_start()) {
+        printf("Failed to start current sensor.\n");
+        Sleep(100);
+    }
+
     while (true) {
-        while (!current_sensor_start()) {
-            printf("Failed to start current sensor.\n");
-            Sleep(100);
-        }
+
 
         uint8_t counter = 0;
         while (!current_sensor_is_data_ready() && counter < 20) {
@@ -56,6 +58,8 @@ _Noreturn void CurrentSensorTask(void* parameters) {
         int32_t current;
         current_sensor_read_conversion(&current);
 
-        printf("Current: %ld\n", current);
+        float converted_current = current_sensor_millivolts(3.3f, current, ADS_GAIN_1);
+
+//        printf("Current: %f\n", converted_current);
     }
 }

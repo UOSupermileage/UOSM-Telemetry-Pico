@@ -7,7 +7,7 @@
 static volatile bool breaks_pressed;
 
 static percentage_t throttle = 0;
-static percentage_t speedData = 0;
+static speed_t speed = 0;
 
 
 bool data_aggregator_get_breaks_pressed() {
@@ -20,5 +20,5 @@ void data_aggregator_set_breaks_pressed(bool pressed) {
 percentage_t data_aggregator_get_throttle() { return throttle; }
 void data_aggregator_set_throttle(percentage_t p) { throttle = p; }
 
-percentage_t data_aggregator_get_speedData() { return speedData; }
-void data_aggregator_set_speedData(percentage_t p) { speedData = p; }
+speed_t data_aggregator_get_speed() { return speed; }
+void data_aggregator_set_speed(speed_t s) { speed = s; }

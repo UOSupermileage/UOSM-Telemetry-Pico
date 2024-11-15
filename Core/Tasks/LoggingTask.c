@@ -83,16 +83,12 @@ _Noreturn void LoggingTask(void* parameters) {
     }
 
     if (fr != FR_EXIST) {
-        f_printf(&fil, "Tick,Throttle\n");
+        f_printf(&fil, "Tick,Throttle,Speed\n");
     }
 
     while (true) {
-        int len = snprintf(row, 128, "%lu,%d\n", xTaskGetTickCount(), data_aggregator_get_throttle());
+        int len = snprintf(row, 128, "%lu,%d, %d\n", xTaskGetTickCount(), data_aggregator_get_throttle(), data_aggregator_get_speed());
         fr = f_write(&fil, row, len, &bw);
-
-
-        int lenght = snprintf(row, 128, "%lu,%d\n", xTaskGetTickCount(), data_aggregator_get_throttle());
-        fr = f_write(&fil, row, lenght, &bw);
 
         static uint8_t i;
         if (i++ % 5 == 0) {
@@ -101,6 +97,4 @@ _Noreturn void LoggingTask(void* parameters) {
 
         Sleep(50);
     }
-
-    
 }
