@@ -40,8 +40,15 @@ typedef enum {
     ADS_VREF_EXTERNAL = 1
 } ads1219_vref_t;
 
+typedef enum {
+    ADS_BATTERY_VOLTAGE,
+    ADS_CURRENT_SENSOR
+} ads1219_mode_t;
+
 bool current_sensor_init();
 bool current_sensor_start();
+bool current_sensor_stop();
+bool current_sensor_set_mode(ads1219_mode_t mode);
 bool current_sensor_is_data_ready();
 bool current_sensor_read_conversion(int32_t* result);
 float current_sensor_millivolts(float vref_millivolts, int32_t raw, ads1219_gain_t gain);

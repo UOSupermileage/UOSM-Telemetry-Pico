@@ -67,7 +67,7 @@ bool current_sensor_reset() {
     return write_byte(ads1219_command_reset, true);
 }
 
-bool current_sensor_begin() {
+bool current_sensor_begin(ads1219_mode_t mode) {
     if (!current_sensor_reset()) {
         printf("Failed to reset current sensor.\n");
         return false;
@@ -83,9 +83,9 @@ bool current_sensor_begin() {
     }
 
     config.gain = ADS_GAIN_1;
-    config.mux = DIFF_P2_N3;
+    config.mux = mode == ADS_CURRENT_SENSOR ? DIFF_P2_N3 : DIFF_P0_N1;
     config.vref = ADS_VREF_EXTERNAL;
-    config.cm = 1;
+    config.cm = 0;
 
     if (!write_register(ads1219_reg_config_write, config.byte)) {
         printf("Failed to set current sensor config.\n");
@@ -95,6 +95,10 @@ bool current_sensor_begin() {
     return true;
 }
 
+bool current_sensor_set_mode(ads1219_mode_t mode) {
+    return current_sensor_begin(mode);
+}
+
 bool current_sensor_init() {
     // Init I2C at 100 kHz
     i2c_init(I2C_INSTANCE, 100 * 1000);
@@ -102,11 +106,15 @@ bool current_sensor_init() {
     gpio_set_function(I2C_SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(I2C_SCL_PIN, GPIO_FUNC_I2C);
 
-    return current_sensor_begin();
+    return current_sensor_begin(ADS_CURRENT_SENSOR);
 }
 
 bool current_sensor_start() {
     return write_byte(ads1219_command_start, true);
+}
+
+bool current_sensor_stop() {
+    return write_byte(ads1219_command_start, false);
 }
 
 bool current_sensor_read_conversion(int32_t* result) {
