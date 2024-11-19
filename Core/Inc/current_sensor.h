@@ -45,6 +45,10 @@ typedef enum {
     ADS_CURRENT_SENSOR
 } ads1219_mode_t;
 
+#define CURRENT_SENSOR_I2C_INSTANCE i2c0
+#define CURRENT_SENSOR_SDA_PIN 20
+#define CURRENT_SENSOR_SCL_PIN 21
+
 bool current_sensor_init();
 bool current_sensor_start();
 bool current_sensor_stop();

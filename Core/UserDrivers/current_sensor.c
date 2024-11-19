@@ -8,15 +8,9 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-// TODO: Does this address need to be shifted (<< 1)
 #define I2C_ADDRESS (0x40)
 
 #define I2C_TIMEOUT 10000
-
-// TODO: Select the correct I2C hardware and pins
-#define I2C_INSTANCE i2c0
-#define I2C_SDA_PIN 20
-#define I2C_SCL_PIN 21
 
 const uint8_t ads1219_reg_config_write = 0x40;
 const uint8_t ads1219_reg_config_read = 0x20;
@@ -100,12 +94,6 @@ bool current_sensor_set_mode(ads1219_mode_t mode) {
 }
 
 bool current_sensor_init() {
-    // Init I2C at 100 kHz
-    i2c_init(I2C_INSTANCE, 100 * 1000);
-
-    gpio_set_function(I2C_SDA_PIN, GPIO_FUNC_I2C);
-    gpio_set_function(I2C_SCL_PIN, GPIO_FUNC_I2C);
-
     return current_sensor_begin(ADS_CURRENT_SENSOR);
 }
 
