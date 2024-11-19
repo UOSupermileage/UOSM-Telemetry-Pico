@@ -12,7 +12,6 @@
 #include "NetworkTask.h"
 #include "SpeedometerTask.h"
 #include "CurrentSensorTask.h"
-#include "Accelerometer.h"
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -25,7 +24,6 @@ _Noreturn void RunTaskManager(void) {
     InitCurrentSensorTask();
     InitSpeedometerTask();
 //    InitNetworkTask();
-    InitAccelerometer();
 
     vTaskStartScheduler();
 
