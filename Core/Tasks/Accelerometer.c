@@ -95,7 +95,7 @@ void lis3dh_read_data(uint8_t reg, float *final_value, bool IsAccel) {
 
 #endif
 
-void InitAccelerometer() {
+void accelerometer_init() {
     stdio_init_all();
 #if !defined(i2c_default) || !defined(PICO_DEFAULT_I2C_SDA_PIN) || !defined(PICO_DEFAULT_I2C_SCL_PIN)
 #warning i2c/lis3dh_i2c example requires a board with I2C pins

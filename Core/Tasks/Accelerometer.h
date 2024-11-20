@@ -5,6 +5,6 @@
 #ifndef UOSM_TELEMETRY_PICO_ACCELEROMETER_H
 #define UOSM_TELEMETRY_PICO_ACCELEROMETER_H
 
-void InitAccelerometer();
+void accelerometer_init();
 
 #endif //UOSM_TELEMETRY_PICO_ACCELEROMETER_H
