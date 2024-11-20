@@ -43,7 +43,8 @@ file(GLOB UOSM_CORE_SOURCES
 add_executable(UOSM_Telemetry_Pico ${SOURCES} ${UOSM_CORE_SOURCES}
         Core/Tasks/Accelerometer.c
         Core/Tasks/accelerometer.h
-        Core/UserDrivers/accelerometer.c)
+        Core/UserDrivers/accelerometer.c
+        Core/Inc/accelerometer.h)
 
 target_compile_definitions(UOSM_Telemetry_Pico PUBLIC MQTT_USE_MBEDTLS LWIP_PROVIDE_ERRNO)
 target_compile_options(UOSM_Telemetry_Pico PRIVATE -Wno-unused-result)
