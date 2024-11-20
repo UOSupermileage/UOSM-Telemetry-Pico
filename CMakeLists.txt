@@ -41,8 +41,6 @@ file(GLOB UOSM_CORE_SOURCES
 )
 
 add_executable(UOSM_Telemetry_Pico ${SOURCES} ${UOSM_CORE_SOURCES}
-        Core/Tasks/CurrentVoltageTask.h
-        Core/Tasks/CurrentVoltageTask.cpp
         Core/Tasks/Accelerometer.c
         Core/Tasks/accelerometer.h)
 
