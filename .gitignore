@@ -2,3 +2,4 @@ cmake-*/
 .vs-code/
 .idea/
 .DS_Store
+pico-sdk/
