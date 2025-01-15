@@ -49,12 +49,12 @@ typedef enum {
 #define CURRENT_SENSOR_SDA_PIN 20
 #define CURRENT_SENSOR_SCL_PIN 21
 
-bool current_sensor_init();
-bool current_sensor_start();
-bool current_sensor_stop();
-bool current_sensor_set_mode(ads1219_mode_t mode);
-bool current_sensor_is_data_ready();
-bool current_sensor_read_conversion(int32_t* result);
-float current_sensor_millivolts(float vref_millivolts, int32_t raw, ads1219_gain_t gain);
+bool voltage_sensor_init();
+bool voltage_sensor_start();
+bool voltage_sensor_stop();
+bool voltage_sensor_set_mode(ads1219_mode_t mode);
+bool voltage_sensor_is_data_ready();
+bool voltage_sensor_read_conversion(int32_t* result);
+float voltage_sensor_millivolts(float vref_millivolts, int32_t raw, ads1219_gain_t gain);
 
 #endif //UOSM_TELEMETRY_PICO_CURRENT_SENSOR_H

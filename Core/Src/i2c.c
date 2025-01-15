@@ -3,7 +3,7 @@
 //
 
 #include "hardware/i2c.h"
-#include "current_sensor.h"
+#include "voltage_sensor.h"
 
 void i2c_setup() {
     // Init I2C at 100 kHz

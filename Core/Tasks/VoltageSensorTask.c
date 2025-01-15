@@ -2,7 +2,7 @@
 // Created by Jeremy Cote on 2024-07-21.
 //
 
-#include "CurrentSensorTask.h"
+#include "VoltageSensorTask.h"
 
 #include "ApplicationTypes.h"
 #include "RTOS.h"

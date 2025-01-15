@@ -2,7 +2,7 @@
 // Created by Jeremy Cote on 2024-09-13.
 //
 
-#include "current_sensor.h"
+#include "voltage_sensor.h"
 #include "hardware/i2c.h"
 
 #include <FreeRTOS.h>
@@ -37,7 +37,7 @@ typedef union
 } ads1219_config_t;
 
 static bool write_bytes(uint8_t* bytes, size_t len, bool end_of_transmission) {
-    int result = i2c_write_timeout_us(I2C_INSTANCE, I2C_ADDRESS, bytes, len, !end_of_transmission, I2C_TIMEOUT);
+    int result = i2c_write_timeout_us(CURRENT_SENSOR_I2C_INSTANCE, I2C_ADDRESS, bytes, len, !end_of_transmission, I2C_TIMEOUT);
     return result == len;
 }
 
@@ -53,7 +53,7 @@ static bool write_register(uint8_t reg, uint8_t data) {
 
 static bool read_register(uint8_t reg, uint8_t* data, size_t len) {
     write_byte(reg, false);
-    int result = i2c_read_timeout_us(I2C_INSTANCE, I2C_ADDRESS, data, len, false, I2C_TIMEOUT);
+    int result = i2c_read_timeout_us(CURRENT_SENSOR_I2C_INSTANCE, I2C_ADDRESS, data, len, false, I2C_TIMEOUT);
     return result == len;
 }
 
@@ -89,23 +89,23 @@ bool current_sensor_begin(ads1219_mode_t mode) {
     return true;
 }
 
-bool current_sensor_set_mode(ads1219_mode_t mode) {
+bool voltage_sensor_set_mode(ads1219_mode_t mode) {
     return current_sensor_begin(mode);
 }
 
-bool current_sensor_init() {
+bool voltage_sensor_init() {
     return current_sensor_begin(ADS_CURRENT_SENSOR);
 }
 
-bool current_sensor_start() {
+bool voltage_sensor_start() {
     return write_byte(ads1219_command_start, true);
 }
 
-bool current_sensor_stop() {
+bool voltage_sensor_stop() {
     return write_byte(ads1219_command_start, false);
 }
 
-bool current_sensor_read_conversion(int32_t* result) {
+bool voltage_sensor_read_conversion(int32_t* result) {
     uint8_t raw_bytes[3];
     if (!read_register(ads1219_command_read, raw_bytes, 3)) {
         printf("Failed to read raw current data.\n");
@@ -132,7 +132,7 @@ bool current_sensor_read_conversion(int32_t* result) {
     return true;
 }
 
-bool current_sensor_is_data_ready() {
+bool voltage_sensor_is_data_ready() {
     uint8_t data;
     bool status = read_register(ads1219_reg_status_read, &data, 1);
 
@@ -141,7 +141,7 @@ bool current_sensor_is_data_ready() {
     return data & 0x80;
 }
 
-float current_sensor_millivolts(float vref_millivolts, int32_t raw, ads1219_gain_t gain) {
+float voltage_sensor_millivolts(float vref_millivolts, int32_t raw, ads1219_gain_t gain) {
     float mV = raw;            // Convert int32_t to float
     mV /= 8388608.0;                  // Convert to a fraction of full-scale (2^23)
     mV *= vref_millivolts; // Convert to millivolts

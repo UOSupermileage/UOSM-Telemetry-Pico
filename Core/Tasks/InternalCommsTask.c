@@ -59,7 +59,7 @@ _Noreturn void InternalCommsTask(void* parameters) {
 
             // The brakes being pressed is an event
             // Don't confuse with the lights message which steering controls
-            iCommsMessage_t lightsTxMsg = IComms_CreateEventMessage(eventsInfo->messageID, BRAKES_ENABLED, brakesPressed);
+            iCommsMessage_t lightsTxMsg = IComms_CreateEventMessage(BRAKES_ENABLED, brakesPressed);
             if (IComms_Transmit(&lightsTxMsg) != RESULT_OK) {
                 DebugPrint("Failed to send brake light signal!");
             }
