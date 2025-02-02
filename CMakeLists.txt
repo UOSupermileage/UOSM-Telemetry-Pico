@@ -41,8 +41,8 @@ file(GLOB UOSM_CORE_SOURCES
 )
 
 add_executable(UOSM_Telemetry_Pico ${SOURCES} ${UOSM_CORE_SOURCES}
-        Core/Tasks/Accelerometer.c
-        Core/Tasks/accelerometer.h
+        Core/Tasks/AccelerometerTask.c
+        Core/Tasks/AccelerometerTask.h
         Core/UserDrivers/accelerometer.c
         Core/Inc/accelerometer.h)
 
