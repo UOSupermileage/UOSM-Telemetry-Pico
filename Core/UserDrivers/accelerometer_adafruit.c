@@ -2,7 +2,10 @@
 // Created by Taha Rashid on 2024-11-19.
 //
 
+// DEPRECATED, will be deleted in a future revision
+
 //Adapted from https://github.com/raspberrypi/pico-examples/blob/master/i2c/lis3dh_i2c/lis3dh_i2c.c
+// UOSM is no longer using this chip.
 
 /**
  * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
@@ -12,9 +15,9 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "pico/stdlib.h"
-#include "pico/binary_info.h"
-#include "hardware/i2c.h"
+#include "../../pico-sdk/src/common/pico_stdlib/include/pico/stdlib.h"
+#include "../../pico-sdk/src/common/pico_binary_info/include/pico/binary_info.h"
+#include "../../pico-sdk/src/rp2_common/hardware_i2c/include/hardware/i2c.h"
 
 //setting the pins to be GP20 and GP21
 //NOTE! These are the GP Pins, NOT the physical pins.
