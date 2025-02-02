@@ -4,8 +4,9 @@
 
 // Communicates with the accelerometer to fetch data
 
-/* PLANS:
+/* TODO:
  * we want to fetch data from accelerometer -> read documentation
+ * look at old implementation in accelerometer_adafruit.c
  * probably want to implement start(), read_data() methods
  * look at current_sensor as an example
  * using i2c, supports speeds
