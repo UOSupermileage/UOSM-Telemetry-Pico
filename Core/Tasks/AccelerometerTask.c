@@ -12,6 +12,7 @@
 #include "RTOS.h"
 #include <FreeRTOS.h>
 #include <task.h>
+#include "accelerometer.h"  // our functions to communicate with the accelerometer
 
 // include Sleep if needed
 
@@ -43,6 +44,7 @@ void InitAccelerometerTask()
 }
 
 // TODO: implement this function to display messages
+// use functions declared in accelerometer.h
 // _Noreturn void AccelerometerTask(void* parameters)
 // {
 //     // run functions from accelerometer.c in here!
