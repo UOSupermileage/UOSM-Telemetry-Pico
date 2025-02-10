@@ -19,6 +19,7 @@
 #define I2C_TIMEOUT 10000
 
 #define I2C_INSTANCE i2c0
+// use sda 20, scl 21?
 #define I2C_SDA_PIN PICO_DEFAULT_I2C_SDA_PIN
 #define I2C_SCL_PIN PICO_DEFAULT_I2C_SCL_PIN
 
