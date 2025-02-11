@@ -10,6 +10,7 @@
 #include "StatusTask.h"
 #include "LoggingTask.h"
 #include "NetworkTask.h"
+#include "SpeedometerTask.h"
 #include "CurrentSensorTask.h"
 #include "AccelerometerTask.h"
 
@@ -22,6 +23,7 @@ _Noreturn void RunTaskManager(void) {
     InitStatusTask();
     InitLoggingTask();
     InitCurrentSensorTask();
+    InitSpeedometerTask();
 //    InitNetworkTask();
     InitAccelerometerTask();
 

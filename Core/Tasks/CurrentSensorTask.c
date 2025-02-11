@@ -43,19 +43,39 @@ _Noreturn void CurrentSensorTask(void* parameters) {
     }
 
     while (true) {
-        while (!current_sensor_start()) {
-            printf("Failed to start current sensor.\n");
-            Sleep(100);
-        }
+        current_sensor_stop();
+        Sleep(50);
+        current_sensor_set_mode(ADS_CURRENT_SENSOR);
+        Sleep(50);
+        current_sensor_start();
 
         uint8_t counter = 0;
         while (!current_sensor_is_data_ready() && counter < 20) {
             Sleep(5);
         }
 
-        int32_t current;
-        current_sensor_read_conversion(&current);
+        int32_t codes;
+        if (current_sensor_read_conversion(&codes)) {
+            float current_mv = current_sensor_millivolts(3300, codes, ADS_GAIN_1);
+            float current = current_mv / 12.5;
+            printf("Current: %fA\n", current);
+        }
 
-        printf("Current: %ld\n", current);
+        current_sensor_stop();
+        Sleep(50);
+        current_sensor_set_mode(ADS_BATTERY_VOLTAGE);
+        Sleep(50);
+        current_sensor_start();
+
+        counter = 0;
+        while (!current_sensor_is_data_ready() && counter < 20) {
+            Sleep(5);
+        }
+
+        if (current_sensor_read_conversion(&codes)) {
+            float battery_mv = current_sensor_millivolts(3300, codes, ADS_GAIN_1);
+            battery_mv *= 19;
+            printf("Battery: %fmV\n", battery_mv);
+        }
     }
 }

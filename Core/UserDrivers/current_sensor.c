@@ -9,15 +9,14 @@
 #include <task.h>
 
 // TODO: Does this address need to be shifted (<< 1)
-#define I2C_ADDRESS 0x40
-#define DATA_READY_PIN 0
+#define I2C_ADDRESS (0x40)
 
-#define I2C_TIMEOUT 1000
+#define I2C_TIMEOUT 10000
 
 // TODO: Select the correct I2C hardware and pins
 #define I2C_INSTANCE i2c0
-#define I2C_SDA_PIN PICO_DEFAULT_I2C_SDA_PIN
-#define I2C_SCL_PIN PICO_DEFAULT_I2C_SCL_PIN
+#define I2C_SDA_PIN 20
+#define I2C_SCL_PIN 21
 
 const uint8_t ads1219_reg_config_write = 0x40;
 const uint8_t ads1219_reg_config_read = 0x20;
@@ -43,34 +42,6 @@ typedef union
     uint8_t byte;
 } ads1219_config_t;
 
-/**
-    Input multiplexer configuration : Configuration Register Bits 7:5
-    These bits configure the input multiplexer.
-    000 : AINP = AIN0, AINN = AIN1 (default)
-    001 : AINP = AIN2, AINN = AIN3
-    010 : AINP = AIN1, AINN = AIN2
-    011 : AINP = AIN0, AINN = AGND
-    100 : AINP = AIN1, AINN = AGND
-    101 : AINP = AIN2, AINN = AGND
-    110 : AINP = AIN3, AINN = AGND
-    111 : AINP and AINN shorted to AVDD / 2
- */
-typedef enum {
-    DIFF_P0_N1 = 0,
-    DIFF_P2_N3,
-    DIFF_P1_N2,
-    SINGLE_0,
-    SINGLE_1,
-    SINGLE_2,
-    SINGLE_3,
-    SHORTED
-} ads1219_mux_t;
-
-typedef enum {
-    ADS_GAIN_1 = 0,
-    ADS_GAIN_4 = 1
-} ads1219_gain_t;
-
 static bool write_bytes(uint8_t* bytes, size_t len, bool end_of_transmission) {
     int result = i2c_write_timeout_us(I2C_INSTANCE, I2C_ADDRESS, bytes, len, !end_of_transmission, I2C_TIMEOUT);
     return result == len;
@@ -83,8 +54,7 @@ static bool write_byte(uint8_t byte, bool end_of_transmission) {
 
 static bool write_register(uint8_t reg, uint8_t data) {
     uint8_t buffer[2] = {reg, data};
-    int result = write_bytes(buffer, 2, true);
-    return result == 2;
+    return write_bytes(buffer, 2, true);
 }
 
 static bool read_register(uint8_t reg, uint8_t* data, size_t len) {
@@ -97,24 +67,7 @@ bool current_sensor_reset() {
     return write_byte(ads1219_command_reset, true);
 }
 
-bool current_sensor_set_gain(const ads1219_gain_t gain) {
-    ads1219_config_t config;
-    if (!read_register(ads1219_reg_config_read, &config.byte, 1)) {
-        printf("Failed to read current sensor config.\n");
-        return false;
-    }
-
-    config.gain = gain;
-
-    if (!write_register(ads1219_reg_config_write, config.byte)) {
-        printf("Failed to set current sensor gain.\n");
-        return false;
-    }
-
-    return true;
-}
-
-bool current_sensor_begin() {
+bool current_sensor_begin(ads1219_mode_t mode) {
     if (!current_sensor_reset()) {
         printf("Failed to reset current sensor.\n");
         return false;
@@ -129,26 +82,39 @@ bool current_sensor_begin() {
         return false;
     }
 
-    current_sensor_set_gain(ADS_GAIN_1);
+    config.gain = ADS_GAIN_1;
+    config.mux = mode == ADS_CURRENT_SENSOR ? DIFF_P2_N3 : DIFF_P0_N1;
+    config.vref = ADS_VREF_EXTERNAL;
+    config.cm = 0;
+
+    if (!write_register(ads1219_reg_config_write, config.byte)) {
+        printf("Failed to set current sensor config.\n");
+        return false;
+    }
+
     return true;
 }
 
-bool current_sensor_init() {
-    gpio_init(DATA_READY_PIN);
-    gpio_set_dir(DATA_READY_PIN, GPIO_IN);
-    gpio_pull_up(SPI_CS);
+bool current_sensor_set_mode(ads1219_mode_t mode) {
+    return current_sensor_begin(mode);
+}
 
+bool current_sensor_init() {
     // Init I2C at 100 kHz
     i2c_init(I2C_INSTANCE, 100 * 1000);
 
     gpio_set_function(I2C_SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(I2C_SCL_PIN, GPIO_FUNC_I2C);
 
-    return current_sensor_begin();
+    return current_sensor_begin(ADS_CURRENT_SENSOR);
 }
 
 bool current_sensor_start() {
     return write_byte(ads1219_command_start, true);
+}
+
+bool current_sensor_stop() {
+    return write_byte(ads1219_command_start, false);
 }
 
 bool current_sensor_read_conversion(int32_t* result) {
@@ -179,5 +145,19 @@ bool current_sensor_read_conversion(int32_t* result) {
 }
 
 bool current_sensor_is_data_ready() {
-    return gpio_get(DATA_READY_PIN) == false;
+    uint8_t data;
+    bool status = read_register(ads1219_reg_status_read, &data, 1);
+
+    if (!status) { return false; }
+
+    return data & 0x80;
+}
+
+float current_sensor_millivolts(float vref_millivolts, int32_t raw, ads1219_gain_t gain) {
+    float mV = raw;            // Convert int32_t to float
+    mV /= 8388608.0;                  // Convert to a fraction of full-scale (2^23)
+    mV *= vref_millivolts; // Convert to millivolts
+    if (gain == ADS_GAIN_4)
+        mV /= 4.0; // Correct for the gain
+    return mV;
 }
