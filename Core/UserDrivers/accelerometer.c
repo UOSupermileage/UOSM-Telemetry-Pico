@@ -103,8 +103,8 @@ void accelerometer_init()
 
  //gpio_init(), gpio_set_dir(), gpio_pull_up()?
 
- // TODO: find correct baud rate
- i2c_init(i2c_default, 10000);
+ // TODO: find correct baud rate, 100khz
+ i2c_init(i2c_default, 100 * 1000);
  gpio_set_function(I2C_SDA_PIN, GPIO_FUNC_I2C);
  gpio_set_function(I2C_SCL_PIN, GPIO_FUNC_I2C);
 
