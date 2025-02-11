@@ -10,6 +10,8 @@
 #include "task.h"
 #include "Sleep.h"
 
+#include "i2c.h"
+
 bool SPI_Init() {
     spi_init(SPI, SPI_BAUDRATE);
     spi_set_format(SPI, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);
@@ -33,6 +35,8 @@ int main() {
     SPI_Init();
 
     interrupts_init();
+
+    i2c_setup();
 
     RunTaskManager();
 }

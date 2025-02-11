@@ -7,6 +7,7 @@
 #include "ApplicationTypes.h"
 #include "CANDriver.h"
 #include "InternalCommsModule.h"
+#include "CANMessageLookUpModule.h"
 #include "RTOS.h"
 #include <FreeRTOS.h>
 #include <task.h>
@@ -45,8 +46,27 @@ _Noreturn void InternalCommsTask(void* parameters) {
         Sleep(500);
     }
 
+    const ICommsMessageInfo* eventsInfo = CANMessageLookUpGetInfo(EVENT_DATA_ID);
+    bool brakesPressed = false;
+    uint8_t brakeLightsTxCounter = 0;
+
     while (true) {
         IComms_PeriodicReceive();
+
+        // If the state of the brakes has changed, skip the counter, and immediately broadcast
+        if (brakesPressed != data_aggregator_get_breaks_pressed() || brakeLightsTxCounter++ > 4) {
+            brakesPressed = data_aggregator_get_breaks_pressed();
+
+            // The brakes being pressed is an event
+            // Don't confuse with the lights message which steering controls
+            iCommsMessage_t lightsTxMsg = IComms_CreateEventMessage(BRAKES_ENABLED, brakesPressed);
+            if (IComms_Transmit(&lightsTxMsg) != RESULT_OK) {
+                DebugPrint("Failed to send brake light signal!");
+            }
+
+            brakeLightsTxCounter = 0;
+        }
+
         Sleep(CAN_POLLING_RATE);
     }
 }

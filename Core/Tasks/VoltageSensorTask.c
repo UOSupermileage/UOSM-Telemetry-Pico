@@ -2,13 +2,13 @@
 // Created by Jeremy Cote on 2024-07-21.
 //
 
-#include "CurrentSensorTask.h"
+#include "VoltageSensorTask.h"
 
 #include "ApplicationTypes.h"
 #include "RTOS.h"
 #include <FreeRTOS.h>
 #include <task.h>
-#include "current_sensor.h"
+#include "voltage_sensor.h"
 
 #include "Sleep.h"
 #include "data_aggregator.h"
@@ -38,42 +38,42 @@ void InitCurrentSensorTask() {
 
 _Noreturn void CurrentSensorTask(void* parameters) {
 
-    while (!current_sensor_init()) {
+    while (!voltage_sensor_init()) {
         Sleep(500);
     }
 
     while (true) {
-        current_sensor_stop();
+        voltage_sensor_stop();
         Sleep(50);
-        current_sensor_set_mode(ADS_CURRENT_SENSOR);
+        voltage_sensor_set_mode(ADS_CURRENT_SENSOR);
         Sleep(50);
-        current_sensor_start();
+        voltage_sensor_start();
 
         uint8_t counter = 0;
-        while (!current_sensor_is_data_ready() && counter < 20) {
+        while (!voltage_sensor_is_data_ready() && counter < 20) {
             Sleep(5);
         }
 
         int32_t codes;
-        if (current_sensor_read_conversion(&codes)) {
-            float current_mv = current_sensor_millivolts(3300, codes, ADS_GAIN_1);
+        if (voltage_sensor_read_conversion(&codes)) {
+            float current_mv = voltage_sensor_millivolts(3300, codes, ADS_GAIN_1);
             float current = current_mv / 12.5;
             printf("Current: %fA\n", current);
         }
 
-        current_sensor_stop();
+        voltage_sensor_stop();
         Sleep(50);
-        current_sensor_set_mode(ADS_BATTERY_VOLTAGE);
+        voltage_sensor_set_mode(ADS_BATTERY_VOLTAGE);
         Sleep(50);
-        current_sensor_start();
+        voltage_sensor_start();
 
         counter = 0;
-        while (!current_sensor_is_data_ready() && counter < 20) {
+        while (!voltage_sensor_is_data_ready() && counter < 20) {
             Sleep(5);
         }
 
-        if (current_sensor_read_conversion(&codes)) {
-            float battery_mv = current_sensor_millivolts(3300, codes, ADS_GAIN_1);
+        if (voltage_sensor_read_conversion(&codes)) {
+            float battery_mv = voltage_sensor_millivolts(3300, codes, ADS_GAIN_1);
             battery_mv *= 19;
             printf("Battery: %fmV\n", battery_mv);
         }
