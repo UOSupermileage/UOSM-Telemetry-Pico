@@ -81,19 +81,19 @@ static bool read_register(uint8_t reg, uint8_t *data, uint8_t len)
 
 
 
-// device config (using defaults)
+// device config
 static bool configure_device(uint8_t config_device_data)
 {
  // default data for config_device_data is 0x00
  return  write_register(iim42653_reg_config_device, config_device_data, true);
 }
 
-// accel config (using defaults)
-static bool configure_accelerometer(config_accel_data)
+// accel config
+static bool configure_accelerometer(uint8_t config_accel0_data, uint8_t config_accel1_data)
 {
  // default data for config_device_data is 0x06
- bool accel0_set = write_register(iim42653_reg_config_accel0, config_accel_data, true);
- bool accel1_set = write_register(iim42653_reg_config_accel1, config_accel_data, true);
+ bool accel0_set = write_register(iim42653_reg_config_accel0, config_accel0_data, true);
+ bool accel1_set = write_register(iim42653_reg_config_accel1, config_accel1_data, true);
 
  // return false + error msg if we could not set the accelerometers
  if (!accel0_set || !accel1_set)
@@ -149,7 +149,10 @@ bool accelerometer_begin()
  vTaskDelay(50);
 
  // configure accelerometer data settings
- if (!configure_accelerometer(0x06))
+ // 0x06 -> Defaults
+ // 0x1C -> Sets order of Accel UI filter to 2nd order,
+ // and sets order of Accel DEC2_M2 filter to 3rd order (only valid value)
+ if (!configure_accelerometer(0x06, 0x1C))
  {
   printf("Failed to configure accelerometer settings.\n");
   return false;
