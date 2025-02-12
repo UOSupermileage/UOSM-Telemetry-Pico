@@ -73,6 +73,7 @@ static bool write_register(uint8_t reg, uint8_t data, bool end_of_transmission)
 // reads data from a register
 static bool read_register(uint8_t reg, uint8_t *data, uint8_t len)
 {
+ // Why do we do write_byte? Just to "start"/continue transmission?
  write_byte(reg, false);
  int result = i2c_read_timeout_us(I2C_INSTANCE, I2C_ADDRESS, data, len, false, I2C_TIMEOUT);
  return result == len;
@@ -127,6 +128,7 @@ bool accelerometer_begin()
  vTaskDelay(50);
 
  // check if the current device is ready (by checking if it is connected)
+ // I think I can just call the function instead (isdataready fn)
  iim42653_config_t config;
  bool ready = read_register(iim42653_read_whoami, &config.byte, 1);
  if (!ready || config.byte != 0x68) // 0x68 is the device address
