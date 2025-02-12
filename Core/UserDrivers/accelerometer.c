@@ -25,8 +25,9 @@
 
 // device and accelerometer config registers
 const uint8_t iim42653_reg_config_device = 0x11;
-const uint8_t iim42653_reg_config_accel0 = 0x00;
-const uint8_t iim42653_reg_config_accel1 = 0x00;
+const uint8_t iim42653_reg_config_pwr_mgmt0 = 0x4E;
+const uint8_t iim42653_reg_config_accel0 = 0x50;
+const uint8_t iim42653_reg_config_accel1 = 0x53;
 
 // registers where the accelerometer data is
 const uint8_t iim42653_reg_accel_x1 = 0x1F;
@@ -169,24 +170,21 @@ bool accelerometer_init()
 bool accelerometer_start()
 {
  // sends command to start receiving data
- // register 0x4E is PWR_MGMT0
  //Low power mode is 0x02, low noise mode is 0x03
- return write_register(0x4E, 0x02, false);
+ return write_register(iim42653_reg_config_pwr_mgmt0, 0x03, false);
 }
 
 // stops the accelerometer
 bool accelerometer_stop()
 {
- // sends command to stop
- // register 0x4E is PWR_MGMT0
- return write_register(0x4E, 0x00, true);
+ // sends command to stop (turns off accel)
+ return write_register(iim42653_reg_config_pwr_mgmt0, 0x00, true);
 }
 
-// TODO: Complete function
 // checks if the accelerometer data is ready
 bool accelerometer_is_data_ready()
 {
- // checks if the data is ready
+ // checks if we are connected to the device
  uint8_t data;
  bool ready = read_register(iim42653_read_whoami, &data, 1);
  if (!ready || data != 0x68) // 0x68 is the device address
