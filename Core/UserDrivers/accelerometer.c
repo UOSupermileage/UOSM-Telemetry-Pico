@@ -197,8 +197,14 @@ bool accelerometer_is_data_ready()
   printf("Failed to connect to accelerometer device.\n");
   return false;
  }
- // bool status = read_register(register status read, &data, 1);
+
+ // No problems!
+ return true;
 }
+
+// TODO: Implement this function
+void accelerometer_read_acceleration() {}
+
 
 /* TODO:
  * we want to fetch data from accelerometer -> read documentation
