@@ -36,14 +36,22 @@ const uint8_t iim42653_reg_accel_y0 = 0x22;
 const uint8_t iim42653_reg_accel_z1 = 0x23;
 const uint8_t iim42653_reg_accel_z0 = 0x24;
 
-// TODO: Check if we need this
+// Used when checking if we are conencted to the board
 const uint8_t iim42653_read_whoami = 0x75;
 
-// TODO: create functions for read_register() (to be universially used)
+// Union to access individual values from the register or access the whole register
+typedef union
+{
+ // struct{}; // Put any configurations in here
+ uint8_t byte;
+} iim42653_config_t;
+
+
+
 // writes multiple bytes. This is a util method (other functions use this method)
 static bool write_bytes(uint8_t* bytes, size_t len, bool end_of_transmission)
 {
- int result = i2c_write_timeout_us(I2C_INSTANCE, I2C_ADDRESS, bytes, len, end_of_transmission , I2C_TIMEOUT);
+ int result = i2c_write_timeout_us(I2C_INSTANCE, I2C_ADDRESS, bytes, len, end_of_transmission, I2C_TIMEOUT);
  return result == len;
 }
 
@@ -55,67 +63,138 @@ static bool write_byte(uint8_t byte, bool end_of_transmission)
 }
 
 // writes to a register
-static bool write_register(uint8_t reg, uint8_t data)
+static bool write_register(uint8_t reg, uint8_t data, bool end_of_transmission)
 {
  const uint8_t buffer[2] = { reg, data };
- return write_bytes(buffer, 2, true);
+ return write_bytes(buffer, 2, end_of_transmission);
 }
 
-// device config, using default config
+// reads data from a register
+static bool read_register(uint8_t reg, uint8_t *data, uint8_t len)
+{
+ write_byte(reg, false);
+ int result = i2c_read_timeout_us(I2C_INSTANCE, I2C_ADDRESS, data, len, false, I2C_TIMEOUT);
+ return result == len;
+}
+
+
+
+
+// device config (using defaults)
 static bool configure_device(uint8_t config_device_data)
 {
  // default data for config_device_data is 0x00
- return  write_register(iim42653_reg_config_device, config_device_data);
+ return  write_register(iim42653_reg_config_device, config_device_data, true);
 }
 
-// accel config, using default config
-static bool configure_acceleromter(config_device_data)
+// accel config (using defaults)
+static bool configure_accelerometer(config_accel_data)
 {
  // default data for config_device_data is 0x06
- return write_register(iim42653_reg_config_device, config_device_data);
+ bool accel0_set = write_register(iim42653_reg_config_accel0, config_accel_data, true);
+ bool accel1_set = write_register(iim42653_reg_config_accel1, config_accel_data, true);
+
+ // return false + error msg if we could not set the accelerometers
+ if (!accel0_set || !accel1_set)
+ {
+  printf("Failed to configure accelerometers!\n");
+  return false;
+ }
+
+ // accelerometers set successfully
+ return true;
 }
+
+
+
 
 bool accelerometer_reset()
 {
- // resets device
+ // resets the device
  return configure_device(0x01);
 }
 
-void accelerometer_begin()
+bool accelerometer_begin()
 {
- accelerometer_reset(); // TODO: Check return
+ // exit if accelerometer does not reset
+ if (!accelerometer_reset())
+ {
+  printf("Accelerometer reset failed\n");
+  return false;
+ }
 
- // TODO: Check if sensor is ready to be read
- // code...
+ vTaskDelay(50);
 
- // TODO: Check return
- // could set full-scale select, ODR for accel, etc.
- configure_device(0x00);
- configure_acceleromter(0x06);
+ // check if the current device is ready (by checking if it is connected)
+ iim42653_config_t config;
+ bool ready = read_register(iim42653_read_whoami, &config.byte, 1);
+ if (!ready || config.byte != 0x68) // 0x68 is the device address
+ {
+  printf("Failed to connect to accelerometer device.\n");
+  return false;
+ }
 
- // returns bool
+ // any setup values here if needed
+ // ...
+
+ // configure devices and check return values
+ // configure device itself
+ if (!configure_device(0x00))
+ {
+  printf("Failed to configure device.\n");
+  return false;
+ }
+
+ vTaskDelay(50);
+
+ // configure accelerometer data settings
+ if (!configure_accelerometer(0x06))
+ {
+  printf("Failed to configure accelerometer settings.\n");
+  return false;
+ }
+
+ // No problems!
+ return true;
 }
 
-void accelerometer_init()
+// functions accessed from AccelerometerTask.c
+// Initializes the accelerometer
+bool accelerometer_init()
 {
- // sets GPIO pins, I2C, and runs accelerometer_begin()
- // look at accelerometer_adafruit.c for example
-
- //gpio_init(), gpio_set_dir(), gpio_pull_up()?
-
- // TODO: find correct baud rate, 100khz
- i2c_init(i2c_default, 100 * 1000);
- gpio_set_function(I2C_SDA_PIN, GPIO_FUNC_I2C);
- gpio_set_function(I2C_SCL_PIN, GPIO_FUNC_I2C);
-
- // return accelerometer_begin()
+ return accelerometer_begin();
 }
 
-void accelerometer_start()
+// starts the accelerometer
+bool accelerometer_start()
 {
  // sends command to start receiving data
- // configure_device(something here?)
- // returns bool
+ // register 0x4E is PWR_MGMT0
+ //Low power mode is 0x02, low noise mode is 0x03
+ return write_register(0x4E, 0x02, false);
+}
+
+// stops the accelerometer
+bool accelerometer_stop()
+{
+ // sends command to stop
+ // register 0x4E is PWR_MGMT0
+ return write_register(0x4E, 0x00, true);
+}
+
+// TODO: Complete function
+// checks if the accelerometer data is ready
+bool accelerometer_is_data_ready()
+{
+ // checks if the data is ready
+ uint8_t data;
+ bool ready = read_register(iim42653_read_whoami, &data, 1);
+ if (!ready || data != 0x68) // 0x68 is the device address
+ {
+  printf("Failed to connect to accelerometer device.\n");
+  return false;
+ }
+ // bool status = read_register(register status read, &data, 1);
 }
 
 /* TODO:
