@@ -30,12 +30,13 @@ const uint8_t iim42653_reg_config_accel0 = 0x50;
 const uint8_t iim42653_reg_config_accel1 = 0x53;
 
 // registers where the accelerometer data is
-const uint8_t iim42653_reg_accel_x1 = 0x1F;
-const uint8_t iim42653_reg_accel_x0 = 0x20;
-const uint8_t iim42653_reg_accel_y1 = 0x21;
-const uint8_t iim42653_reg_accel_y0 = 0x22;
-const uint8_t iim42653_reg_accel_z1 = 0x23;
-const uint8_t iim42653_reg_accel_z0 = 0x24;
+// const uint8_t iim42653_reg_accel_x1 = 0x1F;
+// const uint8_t iim42653_reg_accel_x0 = 0x20;
+// const uint8_t iim42653_reg_accel_y1 = 0x21;
+// const uint8_t iim42653_reg_accel_y0 = 0x22;
+// const uint8_t iim42653_reg_accel_z1 = 0x23;
+// const uint8_t iim42653_reg_accel_z0 = 0x24;
+const uint8_t iim42653_reg_accel_data = 0x1F;  //this register is x1, the next 5 are x0, y1, y0, z1, z0
 
 // Used when checking if we are conencted to the board
 const uint8_t iim42653_read_whoami = 0x75;
@@ -86,7 +87,7 @@ static bool read_register(uint8_t reg, uint8_t *data, uint8_t len)
 static bool configure_device(uint8_t config_device_data)
 {
  // default data for config_device_data is 0x00
- return  write_register(iim42653_reg_config_device, config_device_data, true);
+ return write_register(iim42653_reg_config_device, config_device_data, true);
 }
 
 // accel config
@@ -203,7 +204,29 @@ bool accelerometer_is_data_ready()
 }
 
 // TODO: Implement this function
-void accelerometer_read_acceleration() {}
+bool accelerometer_read_acceleration(int16_t* x, int16_t* y, int16_t* z)
+{
+ uint8_t accel_data[6]; //x1, x0, y1, y0, z1, z0
+ bool status = read_register(iim42653_reg_accel_data, &accel_data, 1);
+ if (!status)
+ {
+  printf("Failed to read accelerometer data.\n");
+  return false;
+ }
+
+ // convert accel data to format we want
+ int16_t x_data = (int16_t)((accel_data[0] << 8) | accel_data[1]);
+ int16_t y_data = (int16_t)((accel_data[2] << 8) | accel_data[3]);
+ int16_t z_data = (int16_t)((accel_data[4] << 8) | accel_data[5]);
+
+ // 32768 is 2^15, 32 is the Full Scale Select value set in accel_config0
+ float lsb_per_g = 32768.0 / 32;
+ *x = (int16_t)(x_data / lsb_per_g);
+ *y = (int16_t)(y_data / lsb_per_g);
+ *z = (int16_t)(z_data / lsb_per_g);
+
+ return true;
+}
 
 
 /* TODO:
