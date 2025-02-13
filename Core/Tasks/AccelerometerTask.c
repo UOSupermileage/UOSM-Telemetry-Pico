@@ -8,10 +8,12 @@
 
 #include "AccelerometerTask.h"
 // include enum header ApplicationTypes.h if needed
+#include "ApplicationTypes.h";
 
 #include "RTOS.h"
 #include <FreeRTOS.h>
 #include <task.h>
+
 #include "accelerometer.h"  // our functions to communicate with the accelerometer
 
 // include Sleep if needed
@@ -45,7 +47,10 @@ void InitAccelerometerTask()
 
 // TODO: implement this function to display messages
 // use functions declared in accelerometer.h
-// _Noreturn void AccelerometerTask(void* parameters)
-// {
-//     // run functions from accelerometer.c in here!
-// }
+_Noreturn void AccelerometerTask(void* parameters)
+{
+    // run functions from accelerometer.c in here!
+    // while (!accelerometer_init()) {}
+    //void accelerometer_init();
+    // We need to fix this, import accelerometer.c?
+}

@@ -11,7 +11,7 @@
 #include "LoggingTask.h"
 #include "NetworkTask.h"
 #include "SpeedometerTask.h"
-#include "CurrentSensorTask.h"
+#include "VoltageSensorTask.h"
 #include "AccelerometerTask.h"
 
 #include <FreeRTOS.h>
