@@ -17,13 +17,13 @@
 #include <task.h>
 
 _Noreturn void RunTaskManager(void) {
-    DebugPrint("Running Task Manager");
-    InitInternalCommsTask();
-    InitStatusTask();
-    InitLoggingTask();
-    InitCurrentSensorTask();
-    InitSpeedometerTask();
-//    InitNetworkTask();
+    printf("Running Task Manager");
+//    InitInternalCommsTask();
+//    InitStatusTask();
+//    InitLoggingTask();
+//    InitCurrentSensorTask();
+//    InitSpeedometerTask();
+    InitNetworkTask();
 
     vTaskStartScheduler();
 

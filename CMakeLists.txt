@@ -25,7 +25,6 @@ include_directories(
         UOSM-Core/Inc
         UOSM-Core/Modules
         UOSM-Core/Utils
-        ${PICO_SDK_PATH}/lib/mbedtls/include
 )
 
 file(GLOB SOURCES
@@ -42,7 +41,6 @@ file(GLOB UOSM_CORE_SOURCES
 
 add_executable(UOSM_Telemetry_Pico ${SOURCES} ${UOSM_CORE_SOURCES})
 
-target_compile_definitions(UOSM_Telemetry_Pico PUBLIC MQTT_USE_MBEDTLS LWIP_PROVIDE_ERRNO)
 target_compile_options(UOSM_Telemetry_Pico PRIVATE -Wno-unused-result)
 
 # Link against the SDK
@@ -53,12 +51,6 @@ target_link_libraries(UOSM_Telemetry_Pico
         hardware_gpio
         FreeRTOS-Kernel
         FreeRTOS-Kernel-Heap4
-        pico_lwip
-        pico_lwip_mbedtls
-        pico_lwip_api
-        pico_lwip_freertos
-        pico_lwip_mqtt
-        pico_async_context_freertos
         no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
 )
 
