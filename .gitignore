@@ -3,3 +3,6 @@ cmake-*/
 .idea/
 .DS_Store
 pico-sdk/
+elf2uf2
+generated/
+FREERTOS_KERNEL/
