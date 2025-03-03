@@ -13,7 +13,8 @@
 // init, start, is_data_ready, read_conversion
 bool accelerometer_init();
 bool accelerometer_start();
+bool accelerometer_stop();
 bool accelerometer_is_data_ready();
-// bool accelerometer_read_acceleration(float* x, float* y, float* z);
+bool accelerometer_read_acceleration(int16_t* x, int16_t* y, int16_t* z);
 
-#endif //USOM_TELEMETRY_PICO_ACCELEROMETER_H
+#endif //UOSM_TELEMETRY_PICO_ACCELEROMETER_H
