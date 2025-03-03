@@ -41,6 +41,8 @@ const uint8_t iim42653_reg_accel_data = 0x1F;  //this register is x1, the next 5
 // Used when checking if we are conencted to the board
 const uint8_t iim42653_read_whoami = 0x75;
 
+
+// TODO: create enums with all the different types of possible configurations for our accelerometer sensor
 // Union to access individual values from the register or access the whole register
 typedef union
 {
@@ -119,6 +121,7 @@ bool accelerometer_reset()
 
 bool accelerometer_begin()
 {
+ // TODO: Maybe move below, and check if the device is ready first?
  // exit if accelerometer does not reset
  if (!accelerometer_reset())
  {
@@ -227,19 +230,3 @@ bool accelerometer_read_acceleration(int16_t* x, int16_t* y, int16_t* z)
 
  return true;
 }
-
-
-/* TODO:
- * we want to fetch data from accelerometer -> read documentation
- * look at old implementation in accelerometer_adafruit.c
- * probably want to implement start(), read_data() methods
- * look at current_sensor as an example
- * using i2c, supports speeds
-*/
-
-/* need to implement (from accelerometer.h)
- * bool accelerometer_init();
- * bool accelerometer_start();
- * bool accelerometer_is_data_ready();
- * bool accelerometer_read_acceleration(float* x, float* y, float* z);
-*/
