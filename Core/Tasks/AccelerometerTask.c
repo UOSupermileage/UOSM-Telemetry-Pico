@@ -8,7 +8,7 @@
 
 #include "AccelerometerTask.h"
 // include enum header ApplicationTypes.h if needed
-#include "ApplicationTypes.h";
+#include "ApplicationTypes.h"
 
 #include "RTOS.h"
 #include <FreeRTOS.h>
@@ -16,7 +16,7 @@
 
 #include "accelerometer.h"  // our functions to communicate with the accelerometer
 
-// include Sleep if needed
+#include "Sleep.h"
 
 // number of 32-bit word to allocate for the task
 // TODO: Figure out the proper number of words to allocate. Temporarily putting 200.
@@ -50,7 +50,32 @@ void InitAccelerometerTask()
 _Noreturn void AccelerometerTask(void* parameters)
 {
     // run functions from accelerometer.c in here!
-    // while (!accelerometer_init()) {}
-    //void accelerometer_init();
-    // We need to fix this, import accelerometer.c?
+    while (!accelerometer_init())
+    {
+        Sleep(500);
+    }
+
+    while (true)
+    {
+        accelerometer_stop();
+        Sleep(50);
+        // set mode?
+        accelerometer_start();
+
+        uint8_t counter = 0;
+        // keep waiting until data is ready
+        while(!accelerometer_is_data_ready() && counter < 20)
+        {
+            Sleep(5);
+        }
+
+        // read accelerometer data
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t z = 0;
+        if(accelerometer_read_acceleration(&x, &y, &z))
+        {
+            printf("Accelerometer reading: x=%f, y=%f, z=%f\n", x, y, z);
+        }
+    }
 }
