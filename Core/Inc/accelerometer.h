@@ -3,7 +3,7 @@
 //
 
 #ifndef UOSM_TELEMETRY_PICO_ACCELEROMETER_H
-#define USOM_TELEMETRY_PICO_ACCELEROMETER_H
+#define UOSM_TELEMETRY_PICO_ACCELEROMETER_H
 // #include <stdbool.h>
 #include "ApplicationTypes.h"
 
