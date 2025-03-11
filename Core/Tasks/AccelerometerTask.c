@@ -76,6 +76,7 @@ _Noreturn void AccelerometerTask(void* parameters)
         if(accelerometer_read_acceleration(&x, &y, &z))
         {
             printf("Accelerometer reading: x=%f, y=%f, z=%f\n", x, y, z);
+            DebugPrint("Aight bet");
         }
     }
 }
