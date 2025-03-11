@@ -210,7 +210,7 @@ bool accelerometer_is_data_ready()
 bool accelerometer_read_acceleration(int16_t* x, int16_t* y, int16_t* z)
 {
  uint8_t accel_data[6]; //x1, x0, y1, y0, z1, z0
- bool status = read_register(iim42653_reg_accel_data, &accel_data, 1);
+ bool status = read_register(iim42653_reg_accel_data, accel_data, 1);
  if (!status)
  {
   printf("Failed to read accelerometer data.\n");
