@@ -40,6 +40,9 @@ void InitInternalCommsTask() {
     );
 }
 
+extern current_t current_ma_can;
+extern voltage_t battery_mv_can;
+
 _Noreturn void InternalCommsTask(void* parameters) {
 
     while (IComms_Init() != RESULT_OK) {
@@ -49,6 +52,9 @@ _Noreturn void InternalCommsTask(void* parameters) {
     const ICommsMessageInfo* eventsInfo = CANMessageLookUpGetInfo(EVENT_DATA_ID);
     bool brakesPressed = false;
     uint8_t brakeLightsTxCounter = 0;
+
+    uint8_t currentTxCount = 0;
+    uint8_t speedTxCount = 0;
 
     while (true) {
         IComms_PeriodicReceive();
@@ -66,6 +72,25 @@ _Noreturn void InternalCommsTask(void* parameters) {
 
             brakeLightsTxCounter = 0;
         }
+
+        if (++currentTxCount >= 4) {
+            iCommsMessage_t currentTxMsg = IComms_CreatePairUInt16BitMessage(CURRENT_VOLTAGE_DATA_ID, current_ma_can, battery_mv_can);
+            if (IComms_Transmit(&currentTxMsg) != RESULT_OK) {
+                DebugPrint("Failed to send current signal!");
+            }
+
+            currentTxCount = 0;
+        }
+
+        if (++speedTxCount >= 4) {
+            iCommsMessage_t speedTxMsg = IComms_CreateUint32BitMessage(SPEED_DATA_ID, data_aggregator_get_speed());
+            if (IComms_Transmit(&speedTxMsg) != RESULT_OK) {
+                DebugPrint("Failed to send speed!");
+            }
+
+            speedTxCount = 0;
+        }
+
 
         Sleep(CAN_POLLING_RATE);
     }

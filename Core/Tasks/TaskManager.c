@@ -18,11 +18,11 @@
 
 _Noreturn void RunTaskManager(void) {
     printf("Running Task Manager");
-//    InitInternalCommsTask();
-//    InitStatusTask();
-//    InitLoggingTask();
-//    InitCurrentSensorTask();
-//    InitSpeedometerTask();
+    InitInternalCommsTask();
+    InitStatusTask();
+    InitLoggingTask();
+    InitCurrentSensorTask();
+    InitSpeedometerTask();
     InitNetworkTask();
 
     vTaskStartScheduler();

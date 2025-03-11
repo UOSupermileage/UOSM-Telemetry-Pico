@@ -8,8 +8,9 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-#define I2C_ADDRESS (0x40)
+#define VREF (1650.0f)
 
+#define I2C_ADDRESS (0x40)
 #define I2C_TIMEOUT 10000
 
 const uint8_t ads1219_reg_config_write = 0x40;
@@ -141,11 +142,20 @@ bool voltage_sensor_is_data_ready() {
     return data & 0x80;
 }
 
-float voltage_sensor_millivolts(float vref_millivolts, int32_t raw, ads1219_gain_t gain) {
-    float mV = raw;            // Convert int32_t to float
-    mV /= 8388608.0;                  // Convert to a fraction of full-scale (2^23)
-    mV *= vref_millivolts; // Convert to millivolts
-    if (gain == ADS_GAIN_4)
-        mV /= 4.0; // Correct for the gain
+float voltage_sensor_convert_vbat(int32_t raw) {
+    float mV = (float) raw;            // Convert int32_t to float
+    mV *= 2 * VREF / (float)(1 << 24);                  // Convert to a fraction of full-scale (2^23)
+    mV += 3300.0f;
+
+    mV *= ( 133.0f + 10.0f) / 10.0f;
+
     return mV;
+}
+
+float voltage_sensor_convert_mA(int32_t raw) {
+    float mV = (float) raw;            // Convert int32_t to float
+    mV *= 2 * VREF / (float)(1 << 24);                  // Convert to a fraction of full-scale (2^23)
+
+    // 12.5mV per amp. Multiply by 1000 to get mA.
+    return mV * 1000.0f / 12.5f;
 }

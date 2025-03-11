@@ -23,6 +23,7 @@
 #include "hw_config.h"
 #include "sd_config.h"
 #include "data_aggregator.h"
+#include "interrupts.h"
 
 /**
  * Number of 32-bit words to allocate for the task.
@@ -55,6 +56,9 @@ void InitLoggingTask() {
     );
 }
 
+extern current_t current_ma_can;
+extern voltage_t battery_mv_can;
+
 _Noreturn void LoggingTask(void* parameters) {
 
     sd_config_init();
@@ -83,11 +87,11 @@ _Noreturn void LoggingTask(void* parameters) {
     }
 
     if (fr != FR_EXIST) {
-        f_printf(&fil, "Tick,Throttle,Speed\n");
+        f_printf(&fil, "Tick,Throttle,Speed,Current,Voltage,Speed\n");
     }
 
     while (true) {
-        int len = snprintf(row, 128, "%lu,%d, %d\n", xTaskGetTickCount(), data_aggregator_get_throttle(), data_aggregator_get_speed());
+        int len = snprintf(row, 128, "%lu,%d, %d, %d, %d, %d\n", xTaskGetTickCount(), data_aggregator_get_throttle(), data_aggregator_get_speed(), current_ma_can, battery_mv_can, speedometer_get_speed());
         fr = f_write(&fil, row, len, &bw);
 
         static uint8_t i;

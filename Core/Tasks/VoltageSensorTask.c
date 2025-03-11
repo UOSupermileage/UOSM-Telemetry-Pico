@@ -24,6 +24,9 @@ TaskHandle_t CurrentSensorTaskHandle;
 StaticTask_t CurrentSensorTaskBuffer;
 StackType_t CurrentSensorTaskStack[CURRENT_SENSOR_STACK_SIZE];
 
+current_t current_ma_can;
+voltage_t battery_mv_can;
+
 void InitCurrentSensorTask() {
     CurrentSensorTaskHandle = xTaskCreateStatic(
             CurrentSensorTask,
@@ -56,9 +59,9 @@ _Noreturn void CurrentSensorTask(void* parameters) {
 
         int32_t codes;
         if (voltage_sensor_read_conversion(&codes)) {
-            float current_mv = voltage_sensor_millivolts(3300, codes, ADS_GAIN_1);
-            float current = current_mv / 12.5;
-            printf("Current: %fA\n", current);
+            float current = voltage_sensor_convert_mA(codes);
+            printf("Current: %fmA\n", current);
+            current_ma_can = (current_t) (current);
         }
 
         voltage_sensor_stop();
@@ -73,9 +76,9 @@ _Noreturn void CurrentSensorTask(void* parameters) {
         }
 
         if (voltage_sensor_read_conversion(&codes)) {
-            float battery_mv = voltage_sensor_millivolts(3300, codes, ADS_GAIN_1);
-            battery_mv *= 19;
+            float battery_mv = voltage_sensor_convert_vbat(codes);
             printf("Battery: %fmV\n", battery_mv);
+            battery_mv_can = (voltage_t) battery_mv;
         }
     }
 }

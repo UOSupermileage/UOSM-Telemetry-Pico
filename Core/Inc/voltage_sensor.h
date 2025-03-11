@@ -55,6 +55,8 @@ bool voltage_sensor_stop();
 bool voltage_sensor_set_mode(ads1219_mode_t mode);
 bool voltage_sensor_is_data_ready();
 bool voltage_sensor_read_conversion(int32_t* result);
-float voltage_sensor_millivolts(float vref_millivolts, int32_t raw, ads1219_gain_t gain);
+
+float voltage_sensor_convert_vbat(int32_t raw);
+float voltage_sensor_convert_mA(int32_t raw);
 
 #endif //UOSM_TELEMETRY_PICO_CURRENT_SENSOR_H
