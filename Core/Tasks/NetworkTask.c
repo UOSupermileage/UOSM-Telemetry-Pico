@@ -16,7 +16,6 @@
 #include "RTOS.h"
 #include "ApplicationTypes.h"
 
-
 /**
  * Number of 32-bit words to allocate for the task.
  */
@@ -29,6 +28,9 @@ StaticTask_t NetworkTaskBuffer;
 StackType_t NetworkTaskStack[STACK_SIZE];
 
 void InitNetworkTask() {
+    modem_init();
+    modem_mqtt_init();
+    modem_gps_init();
     NetworkTaskHandle = xTaskCreateStatic(
             NetworkTask,
             "network",
@@ -41,10 +43,9 @@ void InitNetworkTask() {
 }
 
 _Noreturn void NetworkTask(void* parameters) {
-    modem_init();
-
     while (true) {
-        DebugPrint("To do, implement network\n");
+        // printf("To do, implement network\n");
+        modem_mqtt_publish("test/pico", "Hello World!");
         Sleep(100);
     }
 }
