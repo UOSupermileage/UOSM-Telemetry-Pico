@@ -15,6 +15,7 @@
 #include <stdio.h>
 
 #include <FreeRTOS.h>
+#include <stdlib.h>
 #include <task.h>
 
 #include <string.h>
@@ -53,19 +54,20 @@ void read_uart_response() {
     char c = uart_getc(MODEM_UART);
     if (c == '\n' || index >= 255) {
       buffer[index] = '\0';
-      printf("%s\n", buffer); // Print response
+      printf("Response: %s\n", buffer); // Print response
       index = 0;
     } else {
       buffer[index++] = c;
     }
   }
+  Sleep(100);
 }
 
 static void send_command(const char *cmd) {
   printf("Sending command: %s\n", cmd);
   uart_puts(MODEM_UART, cmd);
   uart_puts(MODEM_UART, "\r\n");
-  Sleep(500);
+  Sleep(100);
 }
 
 void send_command_with_response(const char *cmd) {
@@ -139,13 +141,21 @@ void modem_mqtt_end() {
 
 void modem_mqtt_publish(const char *topic, const char *payload) {
   // Set topic and payload
-  char *topic_cmd = "AT+CMQTTTOPIC=0,";
-  strcat(topic_cmd, topic);
-  send_command_with_response(topic_cmd);
+  char *topic_cmd = "AT+CMQTTTOPIC=0,\"%s\"";
+  char* topic_cmd_str = malloc(strlen(topic) + strlen(topic_cmd) + 2 + 1);
+  // strcpy(topic_cmd_str, topic_cmd);
+  // strcat(topic_cmd_str, topic);
+  sprintf(topic_cmd_str, "AT+CMQTTTOPIC=0,\"%s\"", topic);
+  printf("Topic cmd: %s\n", topic_cmd_str);
+  send_command_with_response(topic_cmd_str);
   // send_command_with_response(topic);
-  char *payload_cmd = "AT+CMQTTPUBLISH=0,";
-  strcat(payload_cmd, payload);
-  send_command_with_response(payload_cmd);
+  char *payload_cmd = "AT+CMQTTPUBLISH=0,\"%s\"";
+  char* payload_cmd_str = malloc(strlen(payload) + strlen(payload_cmd) + 2 + 1);
+  // strcpy(payload_cmd_str, payload_cmd);
+  // strcat(payload_cmd_str, payload);
+  sprintf(payload_cmd_str, "AT+CMQTTPUBLISH=0,\"%s\"", payload);
+  printf("Payload cmd: %s\n", payload_cmd_str);
+  send_command_with_response(payload_cmd_str);
   // send_command_with_response("AT+CMQTTPAYLOAD=0,12");
   // send_command_with_response(payload);
   // Publish message
