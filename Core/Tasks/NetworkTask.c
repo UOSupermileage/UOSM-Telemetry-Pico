@@ -42,9 +42,11 @@ void InitNetworkTask() {
 
 _Noreturn void NetworkTask(void* parameters) {
     modem_init();
+    modem_mqtt_init();
+    modem_gps_init();
 
     while (true) {
-        DebugPrint("To do, implement network\n");
+        modem_mqtt_publish("test/pico", "Hello from Pico");
         Sleep(100);
     }
 }
