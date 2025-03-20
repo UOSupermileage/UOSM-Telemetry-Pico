@@ -58,7 +58,7 @@ target_link_libraries(UOSM_Telemetry_Pico
 pico_enable_stdio_usb(UOSM_Telemetry_Pico 1)
 
 # Enable printf stdout to UART pins 0 and 1
-pico_enable_stdio_uart(UOSM_Telemetry_Pico 1)
+pico_enable_stdio_uart(UOSM_Telemetry_Pico 0)
 
 # Enable the SDK configuration
 pico_add_extra_outputs(UOSM_Telemetry_Pico)

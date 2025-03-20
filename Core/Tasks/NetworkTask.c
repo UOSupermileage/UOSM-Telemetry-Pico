@@ -43,10 +43,13 @@ void InitNetworkTask() {
 _Noreturn void NetworkTask(void* parameters) {
     modem_init();
     modem_mqtt_init();
-    modem_gps_init();
+    //modem_gps_init();
+
+
 
     while (true) {
-        modem_mqtt_publish("test/pico", "Hello from Pico");
+  //      modem_gps_get_location();
+        modem_mqtt_publish("test", "Hello from Pico");
         Sleep(100);
     }
 }

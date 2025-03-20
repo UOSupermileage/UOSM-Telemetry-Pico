@@ -45,8 +45,10 @@
 //   return len;
 // }
 
+
 // Function to read response from SIM7600
 void read_uart_response() {
+  // char* buffers[256];
   char buffer[256];
   int index = 0;
 
@@ -55,13 +57,17 @@ void read_uart_response() {
     if (c == '\n' || index >= 255) {
       buffer[index] = '\0';
       printf("Response: %s\n", buffer); // Print response
+
       index = 0;
     } else {
       buffer[index++] = c;
+
     }
   }
   Sleep(100);
 }
+
+
 
 static void send_command(const char *cmd) {
   printf("Sending command: %s\n", cmd);
@@ -69,6 +75,8 @@ static void send_command(const char *cmd) {
   uart_puts(MODEM_UART, "\r\n");
   Sleep(100);
 }
+
+
 
 void send_command_with_response(const char *cmd) {
   send_command(cmd);
@@ -93,16 +101,63 @@ void send_command_with_response(const char *cmd) {
   // vTaskDelay(pdMS_TO_TICKS(1000)); // Wait for the next task why ?
 }
 
+void send_cert() {
+  char* certificate = "-----BEGIN CERTIFICATE-----\n"
+"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\n"
+"-----END CERTIFICATE-----";
+
+
+  send_command_with_response("AT+CCERTLIST");
+  send_command_with_response("AT+CCERTDOWN=\"isgroot1x.pem\", 1939");
+  send_command(certificate);
+
+  vTaskDelay(pdTICKS_TO_MS(5000));
+}
+
 void modem_init() {
   uart_init(MODEM_UART, MODEM_BAUDRATE);
   gpio_set_function(MODEM_TX_PIN, GPIO_FUNC_UART);
   gpio_set_function(MODEM_RX_PIN, GPIO_FUNC_UART);
 
+  send_command_with_response("ATE0");
+
   send_command_with_response("AT"); // Check SIM7600 is responsive
 
   send_command_with_response("AT+CFUN=1"); // Set full functionality
 
-  send_command_with_response("AT+CREG?"); // Check network registration
+  send_command_with_response("AT+COPS?"); // Check network registration
+
+  send_command_with_response("AT+CCLK?");
+  send_cert();
+
 
   // send_command_with_response("AT+CMQTTSTART"); // Start MQTT service
   // send_command_with_response("AT+CMQTTACCQ=0,\"pico_client\""); // Set client
@@ -120,18 +175,42 @@ void modem_init() {
   // send_command_with_response("AT+CMQTTPUB=0,1,60");
 }
 
-void modem_mqtt_init() {
-  send_command_with_response("AT+CMQTTSTART"); // Start MQTT service
-  send_command_with_response("AT+CMQTTACCQ=0,\"pico_client\""); // Set client ID
 
-  // client  : mosquitto_pub -u pico_client -P pico_PWD_1234 -h 2b0e899ade8f4bbe898bf6b79ab3cfbd.s1.eu.hivemq.cloud -p 8883 -t test/pico -m "aaa"
-  // 'admin' : mosquitto_sub -u admin -P Admin123 -h 2b0e899ade8f4bbe898bf6b79ab3cfbd.s1.eu.hivemq.cloud -p 8883 -t test/pico
+
+void modem_mqtt_init() {
+
+
+
+  send_command_with_response("AT+CREG?");
+  send_command_with_response("AT+CPSI?");
+  send_command_with_response("AT+CEREG?");
+  send_command_with_response("AT+NETOPEN?");
+  send_command_with_response("AT+CGDCONT?");
+
+
+
+
+send_command_with_response("AT+CCHSTOP");
+send_command_with_response("AT+CSSLCFG=\"sslversion\",0,4");
+  send_command_with_response("AT+CSSLCFG=\"authmode\",0,0");
+  send_command_with_response("AT+CSSLCFG=\"ignorelocaltime\",0,1");
+  send_command_with_response("AT+CSSLCFG=\"cacert\",0,\"isrgrootx1.pem\"");
+  send_command_with_response("AT+CSSLCFG=\"ciphersuites\",0,0xFFFF");
+  send_command_with_response("AT+CSSLCFG=\"enableSNI\",0,1");
+
+
+  send_command_with_response("AT+CMQTTSTART"); // Start MQTT ;service
+  send_command_with_response("AT+CMQTTACCQ=0,\"pico_client\",1,4"); // Set client ID
+  send_command_with_response("AT+CMQTTSSLCFG=0,0");
 
   send_command_with_response(
-      "AT+CMQTTCONNECT=0,\"2b0e899ade8f4bbe898bf6b79ab3cfbd.s1.eu.hivemq.cloud:"
-      "8883\",60,1,\"pico_client\",\"pico_PWD_1234\""); // Connect with
+      "AT+CMQTTCONNECT=0,\"tcp://27a94ab6d4504891ab6fec86e08c349f.s1.eu.hivemq.cloud:8883\",60,1,\"pico_client\",\"pico_PWD_1234\""); // Connect with
                                                         // credentials
+
+
+  Sleep(5000);
 }
+
 
 void modem_mqtt_end() {
   send_command_with_response("AT+CMQTTDISC=0"); // Disconnect MQTT
@@ -140,26 +219,17 @@ void modem_mqtt_end() {
 }
 
 void modem_mqtt_publish(const char *topic, const char *payload) {
-  // Set topic and payload
-  char *topic_cmd = "AT+CMQTTTOPIC=0,\"%s\"";
-  char* topic_cmd_str = malloc(strlen(topic) + strlen(topic_cmd) + 2 + 1);
-  // strcpy(topic_cmd_str, topic_cmd);
-  // strcat(topic_cmd_str, topic);
-  sprintf(topic_cmd_str, "AT+CMQTTTOPIC=0,\"%s\"", topic);
-  printf("Topic cmd: %s\n", topic_cmd_str);
-  send_command_with_response(topic_cmd_str);
-  // send_command_with_response(topic);
-  char *payload_cmd = "AT+CMQTTPUBLISH=0,\"%s\"";
-  char* payload_cmd_str = malloc(strlen(payload) + strlen(payload_cmd) + 2 + 1);
-  // strcpy(payload_cmd_str, payload_cmd);
-  // strcat(payload_cmd_str, payload);
-  sprintf(payload_cmd_str, "AT+CMQTTPUBLISH=0,\"%s\"", payload);
-  printf("Payload cmd: %s\n", payload_cmd_str);
-  send_command_with_response(payload_cmd_str);
-  // send_command_with_response("AT+CMQTTPAYLOAD=0,12");
-  // send_command_with_response(payload);
-  // Publish message
-  send_command_with_response("AT+CMQTTPUB=0,1,60");
+  char cmd[32];
+  sprintf(cmd, "AT+CMQTTTOPIC=0,%u", strlen(topic));
+    send_command_with_response(cmd);
+    send_command_with_response(topic);
+
+  sprintf(cmd, "AT+CMQTTPAYLOAD=0,%u", strlen(payload));
+    send_command_with_response(cmd);
+    send_command_with_response(payload);
+
+   send_command_with_response("AT+CMQTTPUB=0,0,120"); // Publish message")
+
 }
 
 void modem_gps_init() {
@@ -174,7 +244,7 @@ void modem_gps_end() {
 }
 
 void modem_gps_get_location() {
-  send_command_with_response("AT+CGNSINF"); // Get GPS information
+  send_command_with_response("AT+CGPSINFO"); // Get GPS information
 }
 
 // void modem_write(const char *data, size_t len) {
