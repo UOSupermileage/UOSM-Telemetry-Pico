@@ -6,7 +6,6 @@
 
 #include <ApplicationTypes.h>
 
-#include "Sleep.h"
 #include "pico/time.h"
 
 #include <hardware/gpio.h>
@@ -57,14 +56,14 @@ void read_uart_response() {
     if (c == '\n' || index >= 255) {
       buffer[index] = '\0';
       printf("Response: %s\n", buffer); // Print response
-
+      //modem_mqtt_publish("logs", buffer);
       index = 0;
     } else {
       buffer[index++] = c;
 
     }
   }
-  Sleep(100);
+  vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 
@@ -73,7 +72,7 @@ static void send_command(const char *cmd) {
   printf("Sending command: %s\n", cmd);
   uart_puts(MODEM_UART, cmd);
   uart_puts(MODEM_UART, "\r\n");
-  Sleep(100);
+  vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 
@@ -208,7 +207,7 @@ send_command_with_response("AT+CSSLCFG=\"sslversion\",0,4");
                                                         // credentials
 
 
-  Sleep(5000);
+  vTaskDelay(pdMS_TO_TICKS(5000));
 }
 
 
@@ -233,9 +232,12 @@ void modem_mqtt_publish(const char *topic, const char *payload) {
 }
 
 void modem_gps_init() {
-  send_command_with_response("AT+CGNSPWR=1");      // Power on GPS
-  send_command_with_response("AT+CGNSIPR=115200"); // Set GPS baud rate
-  send_command_with_response("AT+CGNSTST=1");      // Start GPS
+  send_command_with_response("AT+CGPSURL=\"supl.google.com:7276\"");
+  send_command_with_response("AT+CGPSSSL=0");
+
+  send_command_with_response("AT+CVAUXS=1");
+  send_command_with_response("AT+CGPS=0");
+  send_command_with_response("AT+CGPS=1,2");      // Power on GPS
 }
 
 void modem_gps_end() {
@@ -243,8 +245,9 @@ void modem_gps_end() {
   send_command_with_response("AT+CGNSPWR=0"); // Power off GPS
 }
 
-void modem_gps_get_location() {
+int modem_gps_get_location() {
   send_command_with_response("AT+CGPSINFO"); // Get GPS information
+  return 0;
 }
 
 // void modem_write(const char *data, size_t len) {

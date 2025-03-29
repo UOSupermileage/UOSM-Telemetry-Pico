@@ -18,14 +18,19 @@
 
 _Noreturn void RunTaskManager(void) {
     printf("Running Task Manager");
+/*
     InitInternalCommsTask();
     InitStatusTask();
     InitLoggingTask();
     InitCurrentSensorTask();
     InitSpeedometerTask();
-    InitNetworkTask();
+*/
 
+
+    InitNetworkTask();
     vTaskStartScheduler();
+
+
 
     while (true) {
         DebugPrint("Error: RTOS Scheduler Exited!");

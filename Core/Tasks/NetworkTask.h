@@ -7,4 +7,6 @@
 
 void InitNetworkTask();
 
+void modem_log_task();
+
 #endif //UOSM_TELEMETRY_PICO_NETWORKTASK_H
