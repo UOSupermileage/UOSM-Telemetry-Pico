@@ -40,7 +40,7 @@ void InitNetworkTask() {
             "network",
             STACK_SIZE,
             (void*) NULL,
-            TASK_HIGH_PRIORITY,
+            TASK_MEDIUM_PRIORITY,
             NetworkTaskStack,
             &NetworkTaskBuffer
     );
@@ -49,39 +49,41 @@ void InitNetworkTask() {
 _Noreturn void NetworkTask(void* parameters) {
     modem_init();
    //
-   // modem_mqtt_init();
+    modem_mqtt_init();
     modem_gps_init();
 
 
-    char inf[128];
 
 
     while (true) {
         modem_gps_get_location();
+        modem_log_task();
         Sleep(1000);
+
     }
 
 }
 
-void modem_log_task(char* inf) {
+void modem_log_task() {
+    char inf[32];
 
     speed_t current_speed = data_aggregator_get_speed();
 
-    snprintf(inf, "%d", current_speed);
-    modem_mqtt_publish("telemetry/speed", inf);
+    sprintf(inf, "%u", current_speed);
+    modem_mqtt_publish("speed", inf);
 
 
-    snprintf(inf, "%d", current_ma_can);
-    modem_mqtt_publish("telemetry/current", inf);
+    sprintf(inf, "%u", current_ma_can);
+    modem_mqtt_publish("current", inf);
 
 
 
-    snprintf(inf, "%d", battery_mv_can);
-    modem_mqtt_publish("telemetry/battery", inf);
-    snprintf(inf, "%d", modem_gps_get_location());
-    modem_mqtt_publish("telemetry/location", inf);
-    snprintf(inf, "%d", data_aggregator_get_throttle());
-    modem_mqtt_publish("telemetry/throttle", inf);
+    sprintf(inf, "%u", battery_mv_can);
+    modem_mqtt_publish("battery", inf);
+    sprintf(inf, "%u", modem_gps_get_location());
+    modem_mqtt_publish("location", inf);
+    sprintf(inf, "%u", data_aggregator_get_throttle());
+    modem_mqtt_publish("throttle", inf);
 
 }
 
