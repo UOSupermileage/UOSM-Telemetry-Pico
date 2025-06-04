@@ -10,6 +10,7 @@
 
 #include "LoggingTask.h"
 
+#include <accelerometer.h>
 #include <FreeRTOS.h>
 #include <task.h>
 #include "RTOS.h"
@@ -91,13 +92,19 @@ _Noreturn void LoggingTask(void* parameters) {
     }
 
     while (true) {
-        int len = snprintf(row, 128, "%lu,%d, %d, %d, %d, %d\n", xTaskGetTickCount(), data_aggregator_get_throttle(), data_aggregator_get_speed(), current_ma_can, battery_mv_can, speedometer_get_speed());
-        fr = f_write(&fil, row, len, &bw);
 
+        int len = snprintf(row, 128, "%lu,%d, %d, %d, %d, %d\n", xTaskGetTickCount(), data_aggregator_get_throttle(), data_aggregator_get_speed(), current_ma_can, battery_mv_can, speedometer_get_speed());
+        if (len < 0)
+            DebugPrint("Failed to write; negative len returned.");
+        // fr = f_write(&fil, row, len, &bw);
+
+        fr = f_write(&fil, row, sizeof(row), &bw);
         static uint8_t i;
-        if (i++ % 5 == 0) {
+        if (i++ % 3 == 0) {
             f_sync(&fil);
         }
+
+        memset(row, '\0', sizeof(row));
 
         Sleep(50);
     }

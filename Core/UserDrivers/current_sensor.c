@@ -8,9 +8,8 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-#define VREF (1650.0f)
-
 #define I2C_ADDRESS (0x40)
+
 #define I2C_TIMEOUT 10000
 
 const uint8_t ads1219_reg_config_write = 0x40;
@@ -79,7 +78,7 @@ bool current_sensor_begin(ads1219_mode_t mode) {
 
     config.gain = ADS_GAIN_1;
     config.mux = mode == ADS_CURRENT_SENSOR ? DIFF_P2_N3 : DIFF_P0_N1;
-    config.vref = ADS_VREF_EXTERNAL;
+    config.vref = mode == ADS_CURRENT_SENSOR ? ADS_VREF_INTERNAL : ADS_VREF_EXTERNAL;
     config.cm = 0;
 
     if (!write_register(ads1219_reg_config_write, config.byte)) {
@@ -106,7 +105,7 @@ bool voltage_sensor_stop() {
     return write_byte(ads1219_command_start, false);
 }
 
-bool voltage_sensor_read_conversion(int32_t* result) {
+bool voltage_sensor_read_conversion(uint32_t* result) {
     uint8_t raw_bytes[3];
     if (!read_register(ads1219_command_read, raw_bytes, 3)) {
         printf("Failed to read raw current data.\n");
@@ -142,20 +141,35 @@ bool voltage_sensor_is_data_ready() {
     return data & 0x80;
 }
 
-float voltage_sensor_convert_vbat(int32_t raw) {
-    float mV = (float) raw;            // Convert int32_t to float
-    mV *= 2 * VREF / (float)(1 << 24);                  // Convert to a fraction of full-scale (2^23)
-    mV += 3300.0f;
+float voltage_sensor_volts(uint32_t raw, ads1219_gain_t gain) {
+    bool sign = 0;
+    if (raw >> 31 == 1) {
+        sign = 1;
+        raw -= 0xFFFFFFFF; // flip the signed bit
+        raw += 0xFFFFFF; // flip the 24th bit
+    }
+    float value = (float)raw / 355525.0;
 
-    mV *= ( 133.0f + 10.0f) / 10.0f;
+    if (!sign) {
+        value += 47.19f;
+    }
 
-    return mV;
+    return value;
 }
 
-float voltage_sensor_convert_mA(int32_t raw) {
-    float mV = (float) raw;            // Convert int32_t to float
-    mV *= 2 * VREF / (float)(1 << 24);                  // Convert to a fraction of full-scale (2^23)
+float current_sensor_milliamps(uint32_t raw, ads1219_gain_t gain) {
+    bool sign = 0;
+    if (raw >> 31 == 1) {
+        sign = 1;
+        raw -= 0x00FFFFFFFF; // flip the signed bit
+    }
 
-    // 12.5mV per amp. Multiply by 1000 to get mA.
-    return mV * 1000.0f / 12.5f;
+    float value = raw / 8388607.0 * 2.048;
+    value *= sign ? -1.0 : 1.0;
+
+    value /= 0.0125; // millivolt per milliamp for ssa-100
+
+    value *= 1000;
+
+    return value;
 }

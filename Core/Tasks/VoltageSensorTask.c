@@ -8,6 +8,8 @@
 #include "RTOS.h"
 #include <FreeRTOS.h>
 #include <task.h>
+#include <hardware/adc.h>
+
 #include "voltage_sensor.h"
 
 #include "Sleep.h"
@@ -57,11 +59,11 @@ _Noreturn void CurrentSensorTask(void* parameters) {
             Sleep(5);
         }
 
-        int32_t codes;
+        uint32_t codes;
         if (voltage_sensor_read_conversion(&codes)) {
-            float current = voltage_sensor_convert_mA(codes);
-            printf("Current: %fmA\n", current);
-            current_ma_can = (current_t) (current);
+            float current_ma = current_sensor_milliamps(codes, ADS_GAIN_1);
+            printf("Current: %fA\n", current_ma);
+            current_ma_can = (current_t) current_ma;
         }
 
         voltage_sensor_stop();
@@ -76,7 +78,7 @@ _Noreturn void CurrentSensorTask(void* parameters) {
         }
 
         if (voltage_sensor_read_conversion(&codes)) {
-            float battery_mv = voltage_sensor_convert_vbat(codes);
+            float battery_mv = voltage_sensor_volts(codes, ADS_GAIN_1);
             printf("Battery: %fmV\n", battery_mv);
             battery_mv_can = (voltage_t) battery_mv;
         }

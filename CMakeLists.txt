@@ -25,12 +25,16 @@ include_directories(
         UOSM-Core/Inc
         UOSM-Core/Modules
         UOSM-Core/Utils
+
+        ${PICO_SDK_PATH}/lib/mbedtls/include
+        Vendor/public.mcu.iim42652/Ixm42xxx
 )
 
 file(GLOB SOURCES
         Core/Src/*.c
         Core/Tasks/*.c
         Core/UserDrivers/*.c
+        Vendor/public.mcu.iim42652/Ixm42xxx/*.c
 )
 
 file(GLOB UOSM_CORE_SOURCES
@@ -49,6 +53,7 @@ target_link_libraries(UOSM_Telemetry_Pico
         hardware_spi
         hardware_i2c
         hardware_gpio
+        hardware_adc
         FreeRTOS-Kernel
         FreeRTOS-Kernel-Heap4
         no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
