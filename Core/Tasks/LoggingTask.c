@@ -64,7 +64,7 @@ _Noreturn void LoggingTask(void* parameters) {
 
     sd_config_init();
 
-    while ((fr = f_mount(&fs, "", 1)) != FR_OK && fr != FR_NOT_READY) {
+    while ((fr = f_mount(&fs, "", 1)) != FR_OK && fr != FR_NOT_READY && disk_initialize(fs.id)) {
         DebugPrint("Failed to mount SD Card!");
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -75,11 +75,14 @@ _Noreturn void LoggingTask(void* parameters) {
 
         f_close(&fil);
 
+
+
         if (fr == FR_NO_FILE) {
             break;
         }
 
         file_number++;
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 
     while ((fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE)) != FR_OK && fr != FR_EXIST) {
@@ -88,14 +91,15 @@ _Noreturn void LoggingTask(void* parameters) {
     }
 
     if (fr != FR_EXIST) {
-        f_printf(&fil, "Tick,Throttle,Speed,Current,Voltage,Speed\n");
+        f_printf(&fil, "Tick,Throttle,Speed,Current,Voltage\n");
     }
 
     while (true) {
 
-        int len = snprintf(row, 128, "%lu,%d, %d, %d, %d, %d\n", xTaskGetTickCount(), data_aggregator_get_throttle(), data_aggregator_get_speed(), current_ma_can, battery_mv_can, speedometer_get_speed());
-        if (len < 0)
+        int len = snprintf(row, 128, "%lu,%d, %d, %d, %d\n", pdTICKS_TO_MS(xTaskGetTickCount()), data_aggregator_get_throttle(), data_aggregator_get_speed(), current_ma_can, battery_mv_can);
+        if (len < 0) {
             DebugPrint("Failed to write; negative len returned.");
+        }
         // fr = f_write(&fil, row, len, &bw);
 
         fr = f_write(&fil, row, sizeof(row), &bw);
