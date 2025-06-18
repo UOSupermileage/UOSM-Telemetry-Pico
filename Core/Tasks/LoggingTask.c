@@ -64,7 +64,7 @@ _Noreturn void LoggingTask(void* parameters) {
 
     sd_config_init();
 
-    while ((fr = f_mount(&fs, "", 1)) != FR_OK && fr != FR_NOT_READY && disk_initialize(fs.id)) {
+    while ((fr = f_mount(&fs, "", 1)) != FR_OK && fr != FR_NOT_READY && fr != FR_NO_FILESYSTEM && disk_initialize(fs.id)) {
         DebugPrint("Failed to mount SD Card!");
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
