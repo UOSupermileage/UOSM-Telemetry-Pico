@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <task.h>
 #include <stdint.h>
+#include <stdlib.h>
+
 #include "Ixm42xxxTransport.h"
 #include "Ixm42xxxDefs.h"
 #include "Ixm42xxxDriver_HL.h"
@@ -74,15 +76,15 @@ void HandleInvDeviceDataRegisters(inv_ixm42xxx_sensor_event_t * event) {
  float temp = 0;
 
  if (event->accel[0] != INVALID_VALUE_FIFO) {
-  x = event->accel[0] / 1090.0f;
-  y = event->accel[1] / 1090.0f;
-  z = event->accel[2] / 1090.0f;
+  x = event->accel[0] / 8192.0f;
+  y = event->accel[1] / 8192.0f;
+  z = event->accel[2] / 8192.0f;
 
   printf("%d, %d, %d", x, y, z);
  }
 
  if (event->temperature != INVALID_VALUE_FIFO) {
-  temp = (event->temperature / 2.07) + 25;
+  temp = (event->temperature / 132.48) + 25;
   printf("%d", temp);
  }
 
@@ -131,16 +133,23 @@ static bool write_register(uint8_t reg, uint8_t data, bool end_of_transmission)
 }
 
 int inv_io_hal_read_reg(struct inv_ixm42xxx_serif * serif, uint8_t reg, uint8_t * rbuffer, uint32_t rlen) {
- i2c_write_timeout_us(I2C_INSTANCE, I2C_ADDRESS, &reg, 1, true, I2C_TIMEOUT);
- int rc = i2c_read_timeout_us(I2C_INSTANCE, I2C_ADDRESS, rbuffer, rlen, false, I2C_TIMEOUT);
+ int rc = i2c_write_timeout_us(I2C_INSTANCE, I2C_ADDRESS, &reg, 1, false, I2C_TIMEOUT); // 🔁 false = NO stop
+ if (rc != 1) return 1;
+
+ rc = i2c_read_timeout_us(I2C_INSTANCE, I2C_ADDRESS, rbuffer, rlen, true, I2C_TIMEOUT); // 🔁 true = stop after read
  return (rc == rlen) ? 0 : 1;
 }
 
+
 int inv_io_hal_write_reg(struct inv_ixm42xxx_serif * serif, uint8_t reg, const uint8_t * wbuffer, uint32_t wlen){
- i2c_write_timeout_us(I2C_INSTANCE, I2C_ADDRESS, &reg, 1, true, I2C_TIMEOUT);
- int rc = i2c_write_timeout_us(I2C_INSTANCE, I2C_ADDRESS, wbuffer, wlen, false, I2C_TIMEOUT);
- return (rc == wlen) ? 0 : -1;
+  uint8_t *tx = malloc(wlen + 1);
+ tx[0] = reg;
+ memcpy((void *)(tx + 1), wbuffer, wlen);
+ int rc = i2c_write_timeout_us(I2C_INSTANCE, I2C_ADDRESS, tx, wlen + 1, true, I2C_TIMEOUT);
+ free((void *)tx);
+ return (rc == wlen + 1) ? 0 : -1;
 }
+
 
 void setupHardware(struct inv_ixm42xxx_serif * icm_serif) {
  icm_serif->context   = 0;
@@ -153,8 +162,8 @@ void setupHardware(struct inv_ixm42xxx_serif * icm_serif) {
 static struct inv_ixm42xxx icm_driver;
 
 int accelerometer_start_task() {
- const struct inv_ixm42xxx_serif ixm42xxx_serif;
- const struct clk_calib clk_calib;
+ struct inv_ixm42xxx_serif ixm42xxx_serif;
+ struct clk_calib clk_calib;
 
 
  setupHardware(&ixm42xxx_serif);
@@ -174,21 +183,40 @@ int accelerometer_start_task() {
 
 
  inv_ixm42xxx_set_accel_fsr(&icm_driver, IXM42XXX_ACCEL_CONFIG0_FS_SEL_4g);
-
  inv_ixm42xxx_set_accel_frequency(&icm_driver, IXM42XXX_ACCEL_CONFIG0_ODR_25_HZ);
  inv_ixm42xxx_set_gyro_frequency(&icm_driver, IXM42XXX_GYRO_CONFIG0_ODR_1_KHZ);
  inv_ixm42xxx_set_gyro_fsr(&icm_driver, IXM42XXX_GYRO_CONFIG0_FS_SEL_2000dps);
  inv_ixm42xxx_enable_accel_low_noise_mode(&icm_driver);
 
- //clock_calibration_init(&icm_driver, &clk_calib);
+
+ inv_ixm42xxx_configure_fifo(&icm_driver, INV_IXM42XXX_FIFO_ENABLED);
+ inv_ixm42xxx_reset_fifo(&icm_driver);  // Optional
+
+ clock_calibration_init(&icm_driver, &clk_calib);
+
+
+
 
  return result;
 }
 
 int accelerometer_get_data_from_register() {
- return inv_ixm42xxx_get_data_from_registers(&icm_driver);
-
+ inv_ixm42xxx_get_data_from_registers(&icm_driver);
 }
+
+bool accelerometer_read_acceleration(int16_t* x, int16_t* y, int16_t* z)
+{
+ uint8_t buffer[6];
+ if (!read_register(iim42653_reg_accel_data, buffer, 6))
+  return false;
+
+ *x = (int16_t)((buffer[0] << 8) | buffer[1]);
+ *y = (int16_t)((buffer[2] << 8) | buffer[3]);
+ *z = (int16_t)((buffer[4] << 8) | buffer[5]);
+
+ return true;
+}
+
 
 iim42653_data_t accelerometer_get_data() {
  return accel_data;
@@ -326,16 +354,7 @@ bool accelerometer_is_data_ready()
 }
 
 // TODO: Implement this function
-bool accelerometer_read_acceleration(int16_t* x, int16_t* y, int16_t* z)
-{
 
- return true;
-
-
-x = 0;
- y = 0;
- z = 0;
-}
 
 void inv_ixm42xxx_sleep_us(uint32_t us) {
  vTaskDelay(us / portTICK_PERIOD_MS);

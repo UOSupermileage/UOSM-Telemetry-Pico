@@ -56,20 +56,21 @@ _Noreturn void AccelerometerTask(void* parameters)
 
     printf("result: %d\n", result);
 
+     accelerometer_start();
+
+
     while (true)
     {
+        int16_t x_raw, y_raw, z_raw;
+        int result = accelerometer_get_data_from_register();
 
-        result = accelerometer_get_data_from_register();
+        if (result == 0) {
+            iim42653_data_t data = accelerometer_get_data();
 
-        printf("result: %d\n", result);
+            printf("X: %f, Y: %f, Z: %f\n", data.x, data.y, data.z);
+        }
 
-        vTaskDelay(50);
 
-        const iim42653_data_t data = accelerometer_get_data();
-
-        printf("X: %f", data.x);
-
-        toggle_led();
-
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
