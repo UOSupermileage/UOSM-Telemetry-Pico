@@ -72,6 +72,7 @@ _Noreturn void CurrentSensorTask(void* parameters) {
         Sleep(50);
         voltage_sensor_start();
 
+
         counter = 0;
         while (!voltage_sensor_is_data_ready() && counter < 20) {
             Sleep(5);
@@ -80,7 +81,7 @@ _Noreturn void CurrentSensorTask(void* parameters) {
         if (voltage_sensor_read_conversion(&codes)) {
             float battery_mv = voltage_sensor_volts(codes, ADS_GAIN_1);
             printf("Battery: %fmV\n", battery_mv);
-            battery_mv_can = (voltage_t) battery_mv;
+            battery_mv_can = (voltage_t) (battery_mv * 1000);
         }
     }
 }
