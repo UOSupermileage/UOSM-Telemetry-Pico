@@ -20,12 +20,12 @@
 _Noreturn void RunTaskManager(void) {
     DebugPrint("Running Task Manager");
      InitInternalCommsTask();
-    InitStatusTask();
+     InitStatusTask();
      InitLoggingTask();
      InitCurrentSensorTask();
     // InitSpeedometerTask();
 //    InitNetworkTask();
-   // InitAccelerometerTask();
+     InitAccelerometerTask();
 
 
     vTaskStartScheduler();
