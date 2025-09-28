@@ -96,7 +96,7 @@ _Noreturn void LoggingTask(void* parameters) {
 
     while (true) {
 
-        int len = snprintf(row, 128, "%lu,%d, %d, %d, %d\n", pdTICKS_TO_MS(xTaskGetTickCount()), data_aggregator_get_throttle(), data_aggregator_get_speed(), current_ma_can, battery_mv_can);
+        int len = snprintf(row, 128, "%lu,%d, %d, %d, %d\n", pdTICKS_TO_MS(xTaskGetTickCount()), data_aggregator_get_throttle(), data_aggregator_get_speed(), data_aggregator_get_current(), battery_mv_can);
         if (len < 0) {
             DebugPrint("Failed to write; negative len returned.");
         }

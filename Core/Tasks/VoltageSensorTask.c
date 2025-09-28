@@ -26,7 +26,6 @@ TaskHandle_t CurrentSensorTaskHandle;
 StaticTask_t CurrentSensorTaskBuffer;
 StackType_t CurrentSensorTaskStack[CURRENT_SENSOR_STACK_SIZE];
 
-current_t current_ma_can;
 voltage_t battery_mv_can;
 
 void InitCurrentSensorTask() {

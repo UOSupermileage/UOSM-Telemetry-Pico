@@ -53,7 +53,6 @@ _Noreturn void InternalCommsTask(void* parameters) {
     bool brakesPressed = false;
     uint8_t brakeLightsTxCounter = 0;
 
-    uint8_t currentTxCount = 0;
     uint8_t speedTxCount = 0;
 
     while (true) {
@@ -71,15 +70,6 @@ _Noreturn void InternalCommsTask(void* parameters) {
             }
 
             brakeLightsTxCounter = 0;
-        }
-
-        if (++currentTxCount >= 4) {
-            iCommsMessage_t currentTxMsg = IComms_CreatePairUInt16BitMessage(CURRENT_VOLTAGE_DATA_ID, current_ma_can, battery_mv_can);
-            if (IComms_Transmit(&currentTxMsg) != RESULT_OK) {
-                DebugPrint("Failed to send current signal!");
-            }
-
-            currentTxCount = 0;
         }
 
         if (++speedTxCount >= 4) {
@@ -109,7 +99,11 @@ void EventDataCallback(iCommsMessage_t *msg) { }
 
 void MotorRPMDataCallback(iCommsMessage_t *msg) { }
 
-void CurrentVoltageDataCallback(iCommsMessage_t *msg) { }
+void CurrentVoltageDataCallback(iCommsMessage_t *msg) {
+    uint16_pair_t battery = readMsgPairUInt16Bit(msg);
+    DebugPrint("Current %d", battery.a);
+    data_aggregator_set_current(battery.a);
+}
 
 void LightsDataCallback(iCommsMessage_t *msg) { }
 

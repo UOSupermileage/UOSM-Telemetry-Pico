@@ -16,4 +16,7 @@ void data_aggregator_set_throttle(percentage_t p);
 speed_t data_aggregator_get_speed();
 void data_aggregator_set_speed(speed_t s);
 
+current_t data_aggregator_get_current();
+void data_aggregator_set_current(current_t c);
+
 #endif //UOSM_TELEMETRY_PICO_DATA_AGGREGATOR_H
