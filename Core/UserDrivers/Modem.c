@@ -66,6 +66,27 @@ void read_uart_response() {
   vTaskDelay(pdMS_TO_TICKS(100));
 }
 
+// Function to return response from SIM7600 (By Daniel)
+// To be tested
+char* get_uart_response() {
+  char* buffer = (char*)malloc(256 * sizeof(char)); // Allocate memory on the heap
+  if (buffer == NULL) {
+    return NULL; // Handle allocation failure
+  }
+
+  int index = 0;
+  while (uart_is_readable(MODEM_UART) && index < 255) {
+    char c = uart_getc(MODEM_UART);
+    if (c == '\n') {
+      break; // Exit loop on newline
+    }
+    buffer[index++] = c;
+  }
+  buffer[index] = '\0';
+
+  return buffer;
+}
+
 
 
 static void send_command(const char *cmd) {
@@ -155,7 +176,7 @@ void modem_init() {
   send_command_with_response("AT+COPS?"); // Check network registration
 
   send_command_with_response("AT+CCLK?");
-  send_cert();
+  // send_cert();
 
 
   // send_command_with_response("AT+CMQTTSTART"); // Start MQTT service
@@ -202,8 +223,8 @@ send_command_with_response("AT+CSSLCFG=\"sslversion\",0,4");
   send_command_with_response("AT+CMQTTACCQ=0,\"pico_client\",1,4"); // Set client ID
   send_command_with_response("AT+CMQTTSSLCFG=0,0");
 
-  send_command_with_response(
-      "AT+CMQTTCONNECT=0,\"tcp://27a94ab6d4504891ab6fec86e08c349f.s1.eu.hivemq.cloud:8883\",60,1,\"pico_client\",\"pico_PWD_1234\""); // Connect with
+  send_command_with_response( // admin : "Admin_password1"
+      "AT+CMQTTCONNECT=0,\"tcp://2b52eff9200b40c4ac03d2454074ff7b.s1.eu.hivemq.cloud:8883\",60,1,\"pico_client\",\"pico_Pass1\""); // Connect with
                                                         // credentials
 
 
