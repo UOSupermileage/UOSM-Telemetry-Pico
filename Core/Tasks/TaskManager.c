@@ -25,7 +25,7 @@ _Noreturn void RunTaskManager(void) {
      InitCurrentSensorTask();
     //InitSpeedometerTask();
     //InitNetworkTask();
-    //InitAccelerometerTask();
+    InitAccelerometerTask();
     //Working code.
 
     vTaskStartScheduler();
