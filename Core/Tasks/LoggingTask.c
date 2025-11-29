@@ -45,7 +45,7 @@ static char row[128];
 static uint16_t file_number = 0;
 static uint bw;
 
-void InitLoggingTask() {
+void    InitLoggingTask() {
     LoggingTaskHandle = xTaskCreateStatic(
             LoggingTask,
             "logging",
@@ -97,15 +97,23 @@ _Noreturn void LoggingTask(void* parameters) {
     while (true) {
 
         int len = snprintf(row, 128, "%lu,%d, %d, %d, %d\n", pdTICKS_TO_MS(xTaskGetTickCount()), data_aggregator_get_throttle(), data_aggregator_get_speed(), current_ma_can, battery_mv_can);
-        if (len < 0) {
-            DebugPrint("Failed to write; negative len returned.");
+        if (len < 0 || len >= sizeof(row)) {
+            len = sizeof(row) - 1;
+            DebugPrint("Failed to write; weird len returned. %d", len);
         }
         // fr = f_write(&fil, row, len, &bw);
 
-        fr = f_write(&fil, row, sizeof(row), &bw);
+        fr = f_write(&fil, row, len,  &bw);
+
+        if (fr != FR_OK || bw != len) {
+            DebugPrint("Failed to write %s: %s ()", filename, FRESULT_str(fr), bw);
+        }
+
         static uint8_t i;
-        if (i++ % 3 == 0) {
-            f_sync(&fil);
+        if (i++ % 20 == 0) {
+            if (f_sync(&fil) != FR_OK) {
+                DebugPrint("Failed to sync; fsync failed.");
+            }
         }
 
         memset(row, '\0', sizeof(row));
