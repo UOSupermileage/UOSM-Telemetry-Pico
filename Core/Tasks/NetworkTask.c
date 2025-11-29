@@ -21,7 +21,7 @@
  * Number of 32-bit words to allocate for the task.
  */
 #define STACK_SIZE 1000
-
+/*
 void NetworkTask(void *parameters);
 
 TaskHandle_t NetworkTaskHandle;
@@ -48,3 +48,4 @@ _Noreturn void NetworkTask(void* parameters) {
         Sleep(100);
     }
 }
+*/
