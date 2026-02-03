@@ -19,14 +19,13 @@
 
 _Noreturn void RunTaskManager(void) {
     DebugPrint("Running Task Manager");
-     //InitInternalCommsTask();
-     //InitStatusTask();
-     //InitLoggingTask();
-     //InitCurrentSensorTask();
-    //InitSpeedometerTask();
-    //InitNetworkTask();
+    InitInternalCommsTask();
+    InitStatusTask();
+    InitLoggingTask();
+    InitCurrentSensorTask();
+    InitSpeedometerTask();
     InitAccelerometerTask();
-    //Working code.
+    // InitNetworkTask();
 
     vTaskStartScheduler();
 

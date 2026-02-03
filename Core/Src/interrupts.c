@@ -26,7 +26,8 @@ void interrupts_init() {
 
     // TODO: Review pull direction
     gpio_pull_up(BRAKE_PIN);
-    gpio_pull_up(SPEEDOMETER_PIN);
+    //gpio_pull_up(SPEEDOMETER_PIN);
+    gpio_disable_pulls(SPEEDOMETER_PIN);
 
     gpio_set_irq_enabled_with_callback(BRAKE_PIN, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &brakes_callback);
     gpio_set_irq_enabled_with_callback(SPEEDOMETER_PIN, GPIO_IRQ_EDGE_RISE, true, &speedometer_callback);
