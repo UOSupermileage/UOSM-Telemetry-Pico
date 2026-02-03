@@ -18,25 +18,14 @@
 #include <task.h>
 
 _Noreturn void RunTaskManager(void) {
-<<<<<<< feature/speedometer
-    printf("Running Task Manager");
+    DebugPrint("Running Task Manager");
     InitInternalCommsTask();
     InitStatusTask();
     InitLoggingTask();
     InitCurrentSensorTask();
     InitSpeedometerTask();
+    InitAccelerometerTask();
     // InitNetworkTask();
-=======
-    DebugPrint("Running Task Manager");
-     InitInternalCommsTask();
-     InitStatusTask();
-     InitLoggingTask();
-     InitCurrentSensorTask();
-    //InitSpeedometerTask();
-    //InitNetworkTask();
-    //InitAccelerometerTask();
-
->>>>>>> main
 
     vTaskStartScheduler();
 

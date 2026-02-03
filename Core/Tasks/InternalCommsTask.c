@@ -106,7 +106,11 @@ void EventDataCallback(iCommsMessage_t *msg) { }
 
 void MotorRPMDataCallback(iCommsMessage_t *msg) { }
 
-void CurrentVoltageDataCallback(iCommsMessage_t *msg) { }
+void CurrentVoltageDataCallback(iCommsMessage_t *msg) {
+    uint16_pair_t battery = readMsgPairUInt16Bit(msg);
+    DebugPrint("Current %d", battery.a);
+    data_aggregator_set_current(battery.a);
+}
 
 void LightsDataCallback(iCommsMessage_t *msg) { }
 
