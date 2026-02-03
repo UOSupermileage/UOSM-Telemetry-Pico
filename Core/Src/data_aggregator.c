@@ -17,6 +17,8 @@ void data_aggregator_set_breaks_pressed(bool pressed) {
     breaks_pressed = pressed;
 }
 
+
+
 percentage_t data_aggregator_get_throttle() { return throttle; }
 void data_aggregator_set_throttle(percentage_t p) { throttle = p; }
 

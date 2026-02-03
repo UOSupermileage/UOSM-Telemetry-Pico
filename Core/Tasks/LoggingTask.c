@@ -10,6 +10,7 @@
 
 #include "LoggingTask.h"
 
+#include <accelerometer.h>
 #include <FreeRTOS.h>
 #include <task.h>
 #include "RTOS.h"
@@ -44,7 +45,7 @@ static char row[128];
 static uint16_t file_number = 0;
 static uint bw;
 
-void InitLoggingTask() {
+void    InitLoggingTask() {
     LoggingTaskHandle = xTaskCreateStatic(
             LoggingTask,
             "logging",
@@ -63,7 +64,7 @@ _Noreturn void LoggingTask(void* parameters) {
 
     sd_config_init();
 
-    while ((fr = f_mount(&fs, "", 1)) != FR_OK && fr != FR_NOT_READY) {
+    while ((fr = f_mount(&fs, "", 1)) != FR_OK && fr != FR_NOT_READY && fr != FR_NO_FILESYSTEM && disk_initialize(fs.id)) {
         DebugPrint("Failed to mount SD Card!");
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -74,11 +75,14 @@ _Noreturn void LoggingTask(void* parameters) {
 
         f_close(&fil);
 
+
+
         if (fr == FR_NO_FILE) {
             break;
         }
 
         file_number++;
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 
     while ((fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE)) != FR_OK && fr != FR_EXIST) {
@@ -87,17 +91,32 @@ _Noreturn void LoggingTask(void* parameters) {
     }
 
     if (fr != FR_EXIST) {
-        f_printf(&fil, "Tick,Throttle,Speed,Current,Voltage,Speed\n");
+        f_printf(&fil, "Tick,Throttle,Speed,Current,Voltage\n");
     }
 
     while (true) {
-        int len = snprintf(row, 128, "%lu,%d, %d, %d, %d, %d\n", xTaskGetTickCount(), data_aggregator_get_throttle(), data_aggregator_get_speed(), current_ma_can, battery_mv_can, speedometer_get_speed());
-        fr = f_write(&fil, row, len, &bw);
+
+        int len = snprintf(row, 128, "%lu,%d, %d, %d, %d\n", pdTICKS_TO_MS(xTaskGetTickCount()), data_aggregator_get_throttle(), data_aggregator_get_speed(), current_ma_can, battery_mv_can);
+        if (len < 0 || len >= sizeof(row)) {
+            len = sizeof(row) - 1;
+            DebugPrint("Failed to write; weird len returned. %d", len);
+        }
+        // fr = f_write(&fil, row, len, &bw);
+
+        fr = f_write(&fil, row, len,  &bw);
+
+        if (fr != FR_OK || bw != len) {
+            DebugPrint("Failed to write %s: %s ()", filename, FRESULT_str(fr), bw);
+        }
 
         static uint8_t i;
-        if (i++ % 5 == 0) {
-            f_sync(&fil);
+        if (i++ % 20 == 0) {
+            if (f_sync(&fil) != FR_OK) {
+                DebugPrint("Failed to sync; fsync failed.");
+            }
         }
+
+        memset(row, '\0', sizeof(row));
 
         Sleep(50);
     }
