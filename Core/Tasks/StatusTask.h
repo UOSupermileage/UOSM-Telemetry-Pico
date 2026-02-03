@@ -6,5 +6,6 @@
 #define UOSM_TELEMETRY_PICO_STATUSTASK_H
 
 void InitStatusTask();
+void toggle_led();
 
 #endif //UOSM_TELEMETRY_PICO_STATUSTASK_H

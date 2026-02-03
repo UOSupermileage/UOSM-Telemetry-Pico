@@ -7,3 +7,6 @@
 [submodule "no-OS-FatFS-SD-SDIO-SPI-RPi-Pico"]
 	path = no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
 	url = https://github.com/carlk3/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico.git
+[submodule "Vendor/public.mcu.iim42652"]
+	path = Vendor/public.mcu.iim42652
+	url = https://github.com/InvenSenseInc/public.mcu.iim42652

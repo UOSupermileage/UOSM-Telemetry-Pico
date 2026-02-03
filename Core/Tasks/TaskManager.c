@@ -9,6 +9,7 @@
 #include "InternalCommsTask.h"
 #include "StatusTask.h"
 #include "LoggingTask.h"
+#include "AccelerometerTask.h"
 #include "NetworkTask.h"
 #include "SpeedometerTask.h"
 #include "VoltageSensorTask.h"
@@ -17,13 +18,15 @@
 #include <task.h>
 
 _Noreturn void RunTaskManager(void) {
-    printf("Running Task Manager");
-    InitInternalCommsTask();
-    InitStatusTask();
-    InitLoggingTask();
-    InitCurrentSensorTask();
-    InitSpeedometerTask();
-    InitNetworkTask();
+    DebugPrint("Running Task Manager");
+     InitInternalCommsTask();
+     InitStatusTask();
+     InitLoggingTask();
+     InitCurrentSensorTask();
+    //InitSpeedometerTask();
+    //InitNetworkTask();
+    //InitAccelerometerTask();
+
 
     vTaskStartScheduler();
 

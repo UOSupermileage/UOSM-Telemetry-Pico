@@ -6,6 +6,7 @@
 
 #include <FreeRTOS.h>
 #include <task.h>
+
 #include "RTOS.h"
 #include <hardware/gpio.h>
 
@@ -25,6 +26,8 @@ TaskHandle_t StatusTaskHandle;
 StaticTask_t StatusTaskBuffer;
 StackType_t StatusTaskStack[STACK_SIZE];
 
+bool on_or_off = false;
+
 void InitStatusTask() {
     StatusTaskHandle = xTaskCreateStatic(
             StatusTask,
@@ -37,17 +40,24 @@ void InitStatusTask() {
     );
 }
 
+
+
 _Noreturn void StatusTask(void* parameters) {
     const uint LED_PIN = PICO_DEFAULT_LED_PIN;
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
 
     bool is_on = false;
-
     while (true) {
+
         is_on = !is_on;
         gpio_put(LED_PIN, is_on);
 
+
         Sleep(BLINK_RATE);
     }
+}
+
+void toggle_led() {
+
 }

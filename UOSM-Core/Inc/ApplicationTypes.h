@@ -109,6 +109,7 @@ typedef union {
     };
 } lights_status_t;
 
+
 typedef union {
     uint32_t all;
     struct {
@@ -118,6 +119,15 @@ typedef union {
         uint32_t lap_3: 8;
     };
 } lap_efficiencies_t;
+
+typedef union {
+    struct {
+        float x;
+        float y;
+        float z;
+        float temp;
+    };
+} iim42653_data_t;
 #ifdef __cplusplus
 }
 #endif
