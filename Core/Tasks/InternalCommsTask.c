@@ -53,7 +53,7 @@ _Noreturn void InternalCommsTask(void* parameters) {
     bool brakesPressed = false;
     uint8_t brakeLightsTxCounter = 0;
 
-    uint8_t currentTxCount = 0;
+    uint32_t speed = 0;
     uint8_t speedTxCount = 0;
 
     while (true) {
@@ -73,19 +73,12 @@ _Noreturn void InternalCommsTask(void* parameters) {
             brakeLightsTxCounter = 0;
         }
 
-        if (++currentTxCount >= 4) {
-            iCommsMessage_t currentTxMsg = IComms_CreatePairUInt16BitMessage(CURRENT_VOLTAGE_DATA_ID, current_ma_can, battery_mv_can);
-            if (IComms_Transmit(&currentTxMsg) != RESULT_OK) {
-                DebugPrint("Failed to send current signal!");
-            }
+        if (speed != data_aggregator_get_speed() || speedTxCount++ > 4) {
+            speed = data_aggregator_get_speed();
 
-            currentTxCount = 0;
-        }
-
-        if (++speedTxCount >= 4) {
-            iCommsMessage_t speedTxMsg = IComms_CreateUint32BitMessage(SPEED_DATA_ID, data_aggregator_get_speed());
+            iCommsMessage_t speedTxMsg = IComms_CreateEventMessage(SPEED_DATA_ID, speed);
             if (IComms_Transmit(&speedTxMsg) != RESULT_OK) {
-                DebugPrint("Failed to send speed!");
+                DebugPrint("Failed to send speed signal!");
             }
 
             speedTxCount = 0;
@@ -103,7 +96,11 @@ void ThrottleDataCallback(iCommsMessage_t *msg) {
 
 void ErrorDataCallback(iCommsMessage_t *msg) { }
 
-void SpeedDataCallback(iCommsMessage_t *msg) { }
+void SpeedDataCallback(iCommsMessage_t *msg)
+{
+    speed_t speed = (speed_t) readMsg(msg);
+    data_aggregator_set_speed(speed);
+}
 
 void EventDataCallback(iCommsMessage_t *msg) { }
 
