@@ -21,8 +21,8 @@ _Noreturn void RunTaskManager(void) {
     DebugPrint("Running Task Manager");
      InitInternalCommsTask();
      InitStatusTask();
-     //InitLoggingTask();
-     //InitCurrentSensorTask();
+     InitLoggingTask();
+     InitCurrentSensorTask();
      InitSpeedometerTask();
     //InitNetworkTask();
     //InitAccelerometerTask();
