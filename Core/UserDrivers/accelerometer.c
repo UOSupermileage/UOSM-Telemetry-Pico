@@ -120,7 +120,7 @@ static bool write_bytes(uint8_t* bytes, size_t len, bool end_of_transmission)
 static bool read_register(uint8_t reg, uint8_t *data, uint8_t len)
 {
  // Select register
- write_bytes(reg, 1, false);
+ write_bytes(&reg, 1, false);
  int result = i2c_read_timeout_us(I2C_INSTANCE, I2C_ADDRESS, data, len, false, I2C_TIMEOUT);
  return result == len;
 }

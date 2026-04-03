@@ -23,7 +23,7 @@ _Noreturn void RunTaskManager(void) {
      InitStatusTask();
      InitLoggingTask();
      InitCurrentSensorTask();
-    //InitSpeedometerTask();
+     InitSpeedometerTask();
     //InitNetworkTask();
     //InitAccelerometerTask();
 

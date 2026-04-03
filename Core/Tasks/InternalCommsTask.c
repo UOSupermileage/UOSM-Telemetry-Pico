@@ -59,19 +59,19 @@ _Noreturn void InternalCommsTask(void* parameters) {
     while (true) {
         IComms_PeriodicReceive();
 
-        // If the state of the brakes has changed, skip the counter, and immediately broadcast
-        if (brakesPressed != data_aggregator_get_breaks_pressed() || brakeLightsTxCounter++ > 4) {
-            brakesPressed = data_aggregator_get_breaks_pressed();
-
-            // The brakes being pressed is an event
-            // Don't confuse with the lights message which steering controls
-            iCommsMessage_t lightsTxMsg = IComms_CreateEventMessage(BRAKES_ENABLED, brakesPressed);
-            if (IComms_Transmit(&lightsTxMsg) != RESULT_OK) {
-                DebugPrint("Failed to send brake light signal!");
-            }
-
-            brakeLightsTxCounter = 0;
-        }
+        // // If the state of the brakes has changed, skip the counter, and immediately broadcast
+        // if (brakesPressed != data_aggregator_get_breaks_pressed() || brakeLightsTxCounter++ > 4) {
+        //     brakesPressed = data_aggregator_get_breaks_pressed();
+        //
+        //     // The brakes being pressed is an event
+        //     // Don't confuse with the lights message which steering controls
+        //     iCommsMessage_t lightsTxMsg = IComms_CreateEventMessage(BRAKES_ENABLED, brakesPressed);
+        //     if (IComms_Transmit(&lightsTxMsg) != RESULT_OK) {
+        //         DebugPrint("Failed to send brake light signal!");
+        //     }
+        //
+        //     brakeLightsTxCounter = 0;
+        // }
 
         if (++currentTxCount >= 4) {
             iCommsMessage_t currentTxMsg = IComms_CreatePairUInt16BitMessage(CURRENT_VOLTAGE_DATA_ID, current_ma_can, battery_mv_can);
