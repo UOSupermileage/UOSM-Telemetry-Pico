@@ -52,8 +52,8 @@ volatile uint32_t nTicks = 0;
 volatile uint32_t hallFrequency = 0;
 
 #define HALL_BOLTS 4
-#define HALL_RADIUS 0.2667
-#define HALL_CIRC HALL_RADIUS *PI_T2
+#define HALL_RADIUS 0.27305
+#define HALL_CIRC HALL_RADIUS*PI_T2
 
 void speedometer_callback(uint gpio, uint32_t events) {
     if (state == IDLE) {
