@@ -1,0 +1,167 @@
+//
+// Created by Jeremy Cote on 2024-07-25.
+//
+
+#include "SpeedometerTask.h"
+
+#include <FreeRTOS.h>
+#include <task.h>
+#include "RTOS.h"
+
+#include "f_util.h"
+#include "ff.h"
+
+#include "Sleep.h"
+#include "ApplicationTypes.h"
+
+#include "hw_config.h"
+#include "sd_config.h"
+#include "data_aggregator.h"
+
+/**
+ * Number of 32-bit words to allocate for the task.
+ */
+#define STACK_SIZE 1000
+
+void SpeedometerTask(void *parameters);
+
+TaskHandle_t SpeedometerTaskHandle;
+StaticTask_t SpeedometerTaskBuffer;
+StackType_t SpeedometerTaskStack[STACK_SIZE];
+
+void InitSpeedometerTask() {
+    SpeedometerTaskHandle = xTaskCreateStatic(
+            SpeedometerTask,
+            "speed",
+            STACK_SIZE,
+            (void*) NULL,
+            TASK_LOW_PRIORITY,
+            SpeedometerTaskStack,
+            &SpeedometerTaskBuffer
+    );
+}
+
+/* ---------------- Speedometer configuration ---------------- */
+
+#define HALL_BOLTS              4U
+
+/* 55 cm diameter wheel = 0.55 m */
+#define WHEEL_DIAMETER_M        (0.55f)
+#define WHEEL_CIRC_M            (3.14159265359f * WHEEL_DIAMETER_M)
+
+#define SPEED_TIMEOUT_TICKS     pdMS_TO_TICKS(1000)
+
+/* reject pulses that arrive too fast to be real. */ //(90/60)*(0.546*3.1416)*3.6
+#define SLOW_SPEED_TICKS    100
+#define MEDIUM_SPEED_TICKS  60
+#define HIGH_SPEED_TICKS    35
+uint32_t MIN_VALID_PERIOD_TICKS = SLOW_SPEED_TICKS;
+
+/* ---------------- ISR-shared state ---------------- */
+
+static volatile TickType_t g_last_tick = 0;
+static volatile TickType_t g_period_ticks = 0;
+static volatile bool g_period_valid = false;
+
+
+void speedometer_callback(uint gpio, uint32_t events) {
+
+    TickType_t now = xTaskGetTickCountFromISR();
+
+    if (g_last_tick != 0) {
+        TickType_t dt = now - g_last_tick;
+
+        if (dt >= MIN_VALID_PERIOD_TICKS) {
+            g_period_ticks = dt;
+            g_period_valid = true;
+        }
+    }
+
+    g_last_tick = now;
+}
+
+static float speedometer_get_speed_mps(void) {
+    TickType_t period;
+    TickType_t last;
+    bool valid;
+    TickType_t now;
+
+    taskENTER_CRITICAL();
+    period = g_period_ticks;
+    last = g_last_tick;
+    valid = g_period_valid;
+    taskEXIT_CRITICAL();
+
+    if (!valid || period == 0) {
+        return 0.0f;
+    }
+
+    now = xTaskGetTickCount();
+
+    /* No recent pulse => stopped */
+    if ((now - last) > SPEED_TIMEOUT_TICKS) {
+        return 0.0f;
+    }
+
+    /* pulses/s */
+    float pulse_freq = (float)configTICK_RATE_HZ / (float)period;
+
+    /* wheel rev/s */
+    float wheel_rps = pulse_freq / (float)HALL_BOLTS;
+
+    /* linear speed in m/s */
+    return wheel_rps * WHEEL_CIRC_M;
+}
+
+static float speedometer_get_speed_meter_ph_f(void) {
+    return speedometer_get_speed_mps() * 3600.0f;
+}
+
+/* Return integer m/h in speed_t */
+static speed_t speedometer_get_speed(void) {
+    float speed_mph = speedometer_get_speed_meter_ph_f();
+
+    if (speed_mph <= 0.0f) {
+        return (speed_t)0;
+    }
+
+    /* Round to nearest integer */
+    return (speed_t)(speed_mph + 0.5f);
+}
+
+uint8_t speedometer_count;
+speed_t last_speed;
+
+_Noreturn void SpeedometerTask(void *parameters) {
+    (void)parameters;
+
+    last_speed = 0;
+    speedometer_count = 0;
+
+    while (true) {
+        speed_t current_speed = speedometer_get_speed();
+
+        if (last_speed == current_speed) {
+            if (speedometer_count < 255) {
+                speedometer_count++;
+            }
+        } else {
+            speedometer_count = 0;
+        }
+
+        if (speedometer_count > 5 && current_speed == 0) {
+            data_aggregator_set_speed(0);
+            MIN_VALID_PERIOD_TICKS = SLOW_SPEED_TICKS;
+        } else {
+            data_aggregator_set_speed(current_speed);
+            if (current_speed < 14000) MIN_VALID_PERIOD_TICKS = SLOW_SPEED_TICKS;
+            else if (current_speed < 22000) MIN_VALID_PERIOD_TICKS = MEDIUM_SPEED_TICKS;
+            else MIN_VALID_PERIOD_TICKS = HIGH_SPEED_TICKS;
+        }
+
+        last_speed = current_speed;
+
+        printf("Speedometer: %u m/h\n", (unsigned)data_aggregator_get_speed());
+        Sleep(200);
+    }
+}
