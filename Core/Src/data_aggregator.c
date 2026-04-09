@@ -11,9 +11,10 @@ static speed_t speed = 0;
 static current_t current = 0;
 
 
-bool data_aggregator_get_breaks_pressed() {
+bool data_aggregator_get_breaks_pressed(void) {
     return breaks_pressed;
 }
+
 void data_aggregator_set_breaks_pressed(bool pressed) {
     breaks_pressed = pressed;
 }

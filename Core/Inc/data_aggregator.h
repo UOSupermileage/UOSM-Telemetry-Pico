@@ -7,8 +7,9 @@
 
 #include "ApplicationTypes.h"
 
-bool data_aggregator_get_breaks_pressed();
-void data_aggregator_set_breaks_pressed(bool);
+/* Brake GPIO: updated from IRQ handler; safe visibility via volatile in the .c file. */
+bool data_aggregator_get_breaks_pressed(void);
+void data_aggregator_set_breaks_pressed(bool pressed);
 
 percentage_t data_aggregator_get_throttle();
 void data_aggregator_set_throttle(percentage_t p);
