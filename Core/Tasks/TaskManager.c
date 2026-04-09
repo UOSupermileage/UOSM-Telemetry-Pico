@@ -7,6 +7,8 @@
 #include "ApplicationTypes.h"
 #include "interrupts.h"
 
+#include "pico/stdlib.h"
+
 #include "InternalCommsTask.h"
 #include "StatusTask.h"
 #include "LoggingTask.h"
@@ -36,6 +38,9 @@ static void InitIrqEnableTask(void) {
             IrqInitTaskStack,
             &IrqInitTaskBuffer
     );
+    if (IrqInitTaskHandle == NULL) {
+        panic("InitIrqEnableTask: xTaskCreateStatic failed");
+    }
 }
 
 static void IrqInitTask(void *parameters) {

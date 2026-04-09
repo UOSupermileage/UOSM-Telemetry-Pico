@@ -4,6 +4,8 @@
 
 #include "StatusTask.h"
 
+#include "pico/stdlib.h"
+
 #include <FreeRTOS.h>
 #include <task.h>
 
@@ -38,6 +40,9 @@ void InitStatusTask() {
             StatusTaskStack,
             &StatusTaskBuffer
     );
+    if (StatusTaskHandle == NULL) {
+        panic("InitStatusTask: xTaskCreateStatic failed");
+    }
 }
 
 

@@ -4,6 +4,8 @@
 
 #include "InternalCommsTask.h"
 
+#include "pico/stdlib.h"
+
 #include "ApplicationTypes.h"
 #include "CANDriver.h"
 #include "InternalCommsModule.h"
@@ -38,10 +40,10 @@ void InitInternalCommsTask() {
             InternalCommsTaskStack,
             &InternalCommsTaskBuffer
     );
+    if (InternalCommsTaskHandle == NULL) {
+        panic("InitInternalCommsTask: xTaskCreateStatic failed");
+    }
 }
-
-extern current_t current_ma_can;
-extern voltage_t battery_mv_can;
 
 _Noreturn void InternalCommsTask(void* parameters) {
 

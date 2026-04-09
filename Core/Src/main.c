@@ -8,7 +8,6 @@
 #include "interrupts.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "Sleep.h"
 
 #include "i2c.h"
 
@@ -41,8 +40,7 @@ int main() {
     RunTaskManager();
 }
 
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName ) {
-    while (true) {
-        Sleep(100);
-    }
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
+    (void) xTask;
+    panic("FreeRTOS stack overflow (task=%s)", pcTaskName ? pcTaskName : "?");
 }

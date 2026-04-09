@@ -4,6 +4,8 @@
 
 #include "SpeedometerTask.h"
 
+#include "pico/stdlib.h"
+
 #include <FreeRTOS.h>
 #include <task.h>
 #include "RTOS.h"
@@ -39,6 +41,9 @@ void InitSpeedometerTask() {
             SpeedometerTaskStack,
             &SpeedometerTaskBuffer
     );
+    if (SpeedometerTaskHandle == NULL) {
+        panic("InitSpeedometerTask: xTaskCreateStatic failed");
+    }
 }
 
 

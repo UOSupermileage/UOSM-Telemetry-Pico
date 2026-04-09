@@ -9,6 +9,8 @@
 // include enum header ApplicationTypes.h if needed
 #include "ApplicationTypes.h"
 
+#include "pico/stdlib.h"
+
 #include "RTOS.h"
 #include <FreeRTOS.h>
 #include <StatusTask.h>
@@ -43,6 +45,9 @@ void InitAccelerometerTask()
         AccelerometerTaskStack,             // the actual stack allocated to the task (the memory area for local variables and function calls)
         &AccelerometerTaskBuffer            // Pointer to a StackType_t structure for task control
         );
+    if (AccelerometerTaskHandle == NULL) {
+        panic("InitAccelerometerTask: xTaskCreateStatic failed");
+    }
 }
 
 // TODO: implement this function to display messages

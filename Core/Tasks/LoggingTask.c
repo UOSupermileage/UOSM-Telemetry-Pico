@@ -4,6 +4,8 @@
 
 #include "LoggingTask.h"
 
+#include "pico/stdlib.h"
+
 #include <FreeRTOS.h>
 #include <task.h>
 #include "RTOS.h"
@@ -48,6 +50,9 @@ void InitLoggingTask() {
             LoggingTaskStack,
             &LoggingTaskBuffer
     );
+    if (LoggingTaskHandle == NULL) {
+        panic("InitLoggingTask: xTaskCreateStatic failed");
+    }
 }
 
 _Noreturn void LoggingTask(void* parameters) {

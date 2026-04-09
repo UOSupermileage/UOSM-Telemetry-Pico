@@ -4,6 +4,8 @@
 
 #include "VoltageSensorTask.h"
 
+#include "pico/stdlib.h"
+
 #include "ApplicationTypes.h"
 #include "RTOS.h"
 #include <FreeRTOS.h>
@@ -37,6 +39,9 @@ void InitCurrentSensorTask() {
             CurrentSensorTaskStack,
             &CurrentSensorTaskBuffer
     );
+    if (CurrentSensorTaskHandle == NULL) {
+        panic("InitCurrentSensorTask: xTaskCreateStatic failed");
+    }
 }
 
 _Noreturn void CurrentSensorTask(void* parameters) {
