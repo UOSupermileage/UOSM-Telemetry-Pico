@@ -83,8 +83,18 @@ void speedometer_callback(uint gpio, uint32_t events) {
     hallFrequency = nTicks;
 }
 
-speed_t speedometer_get_speed() {
-    uint32_t f = (uint32_t)(100 * configTICK_RATE_HZ / nTicks);
+speed_t speedometer_get_speed(void) {
+    uint32_t ticks_local;
+
+    taskENTER_CRITICAL();
+    ticks_local = nTicks;
+    taskEXIT_CRITICAL();
+
+    if (ticks_local == 0) {
+        return 0;
+    }
+
+    uint32_t f = (uint32_t)(100 * configTICK_RATE_HZ / ticks_local);
     return f * 36 * HALL_CIRC / HALL_BOLTS;
 }
 
