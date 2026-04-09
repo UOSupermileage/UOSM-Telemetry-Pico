@@ -61,7 +61,7 @@
 #define configQUEUE_REGISTRY_SIZE               8
 #define configUSE_QUEUE_SETS                    1
 #define configUSE_TIME_SLICING                  1
-#define configUSE_NEWLIB_REENTRANT              0
+#define configUSE_NEWLIB_REENTRANT              1
 #define configENABLE_BACKWARD_COMPATIBILITY     0
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
 
@@ -83,7 +83,6 @@
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 
 /* Run time and task stats gathering related definitions. */
-#define configUSE_TRACE_FACILITY                1
 #define configUSE_STATS_FORMATTING_FUNCTIONS    0
 
 /* Co-routine related definitions. */
@@ -139,11 +138,10 @@ to exclude the API function. */
 
 /* A header file that defines trace macro can be included here. */
 
-// Debugging Stuff
-#define configUSE_TRACE_FACILITY 1
-#define configMAX_TASK_NAME_LEN 20
-#define configRECORD_STACK_HIGH_ADDRESS 1
-#define configUSE_TRACE_FACILITY 1
-#define configGENERATE_RUN_TIME_STATS 0
+// Debugging / trace
+#define configUSE_TRACE_FACILITY                1
+#define configMAX_TASK_NAME_LEN                 20
+#define configRECORD_STACK_HIGH_ADDRESS         1
+#define configGENERATE_RUN_TIME_STATS           0
 
 #endif /* FREERTOS_CONFIG_H */
