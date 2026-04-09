@@ -5,6 +5,7 @@
 #include "TaskManager.h"
 
 #include "ApplicationTypes.h"
+#include "RTOS.h"
 #include "interrupts.h"
 
 #include "pico/stdlib.h"

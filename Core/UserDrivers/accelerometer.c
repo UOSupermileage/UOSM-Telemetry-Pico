@@ -6,6 +6,7 @@
 
 #include "accelerometer.h"
 #include "hardware/i2c.h"
+#include "pico/time.h"
 
 #include <FreeRTOS.h>
 #include <helperClockCalib.h>
@@ -360,7 +361,7 @@ void inv_ixm42xxx_sleep_us(uint32_t us) {
  vTaskDelay(us / portTICK_PERIOD_MS);
 }
 uint64_t inv_ixm42xxx_get_time_us(void) {
- return get_absolute_time()._private_us_since_boot;
+    return to_us_since_boot(get_absolute_time());
 }
 
 void inv_helper_disable_irq() {
