@@ -11,4 +11,6 @@ void InitSpeedometerTask();
 
 void speedometer_callback(uint gpio, uint32_t events);
 
+speed_t speedometer_get_speed(void);
+
 #endif //UOSM_TELEMETRY_PICO_SPEEDOMETERTASK_H

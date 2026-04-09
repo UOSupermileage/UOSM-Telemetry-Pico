@@ -7,8 +7,7 @@
 
 #include "ApplicationTypes.h"
 
-void interrupts_init();
-
-speed_t speedometer_get_speed();
+void interrupts_gpio_configure(void);
+void interrupts_irq_enable(void);
 
 #endif //UOSM_TELEMETRY_PICO_INTERRUPTS_H

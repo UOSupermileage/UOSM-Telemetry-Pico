@@ -5,6 +5,7 @@
 #include "TaskManager.h"
 
 #include "ApplicationTypes.h"
+#include "interrupts.h"
 
 #include "InternalCommsTask.h"
 #include "StatusTask.h"
@@ -17,8 +18,35 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+#define IRQ_INIT_STACK_WORDS 128
+
+static void IrqInitTask(void *parameters);
+
+static TaskHandle_t IrqInitTaskHandle;
+static StaticTask_t IrqInitTaskBuffer;
+static StackType_t IrqInitTaskStack[IRQ_INIT_STACK_WORDS];
+
+static void InitIrqEnableTask(void) {
+    IrqInitTaskHandle = xTaskCreateStatic(
+            IrqInitTask,
+            "irqinit",
+            IRQ_INIT_STACK_WORDS,
+            NULL,
+            TASK_IRQ_INIT_PRIORITY,
+            IrqInitTaskStack,
+            &IrqInitTaskBuffer
+    );
+}
+
+static void IrqInitTask(void *parameters) {
+    (void) parameters;
+    interrupts_irq_enable();
+    vTaskDelete(NULL);
+}
+
 _Noreturn void RunTaskManager(void) {
     DebugPrint("Running Task Manager");
+    InitIrqEnableTask();
     InitInternalCommsTask();
     InitStatusTask();
     InitLoggingTask();

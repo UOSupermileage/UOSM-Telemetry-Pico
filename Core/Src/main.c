@@ -34,7 +34,7 @@ int main() {
 
     SPI_Init();
 
-    interrupts_init();
+    interrupts_gpio_configure();
 
     i2c_setup();
 

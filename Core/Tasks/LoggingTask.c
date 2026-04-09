@@ -24,7 +24,6 @@
 #include "hw_config.h"
 #include "sd_config.h"
 #include "data_aggregator.h"
-#include "interrupts.h"
 
 /**
  * Number of 32-bit words to allocate for the task.
