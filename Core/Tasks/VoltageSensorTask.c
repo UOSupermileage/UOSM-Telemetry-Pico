@@ -14,6 +14,7 @@
 
 #include "Sleep.h"
 #include "data_aggregator.h"
+#include "telemetry.h"
 
 /**
  * Number of 32-bit words to allocate for the task.
@@ -25,9 +26,6 @@ void CurrentSensorTask(void *parameters);
 TaskHandle_t CurrentSensorTaskHandle;
 StaticTask_t CurrentSensorTaskBuffer;
 StackType_t CurrentSensorTaskStack[CURRENT_SENSOR_STACK_SIZE];
-
-voltage_t battery_mv_can;
-current_t current_ma_can;
 
 void InitCurrentSensorTask() {
     CurrentSensorTaskHandle = xTaskCreateStatic(
@@ -64,7 +62,7 @@ _Noreturn void CurrentSensorTask(void* parameters) {
         if (voltage_sensor_read_conversion(&codes)) {
             float current_ma = current_sensor_milliamps(codes, ADS_GAIN_1);
             printf("Current: %fA\n", current_ma);
-            current_ma_can = (current_t) current_ma;
+            telemetry_set_current_ma((current_t) current_ma);
         }
 
         voltage_sensor_stop();
@@ -83,7 +81,7 @@ _Noreturn void CurrentSensorTask(void* parameters) {
         if (voltage_sensor_read_conversion(&codes)) {
             float battery_mv = voltage_sensor_volts(codes, ADS_GAIN_1);
             printf("Battery: %fmV\n", battery_mv);
-            battery_mv_can = (voltage_t) (battery_mv * 1000);
+            telemetry_set_battery_mv((voltage_t) (battery_mv * 1000));
         }
     }
 }

@@ -17,6 +17,7 @@
 #include "hw_config.h"
 #include "sd_config.h"
 #include "data_aggregator.h"
+#include "telemetry.h"
 
 /**
  * Number of 32-bit words to allocate for the task.
@@ -48,9 +49,6 @@ void InitLoggingTask() {
             &LoggingTaskBuffer
     );
 }
-
-extern current_t current_ma_can;
-extern voltage_t battery_mv_can;
 
 _Noreturn void LoggingTask(void* parameters) {
 
@@ -90,7 +88,7 @@ _Noreturn void LoggingTask(void* parameters) {
 
     while (true) {
 
-        int len = snprintf(row, 128, "%lu,%d, %d, %d, %d\n", pdTICKS_TO_MS(xTaskGetTickCount()), data_aggregator_get_throttle(), data_aggregator_get_speed(), current_ma_can, battery_mv_can);
+        int len = snprintf(row, 128, "%lu,%d, %d, %d, %d\n", pdTICKS_TO_MS(xTaskGetTickCount()), data_aggregator_get_throttle(), data_aggregator_get_speed(), telemetry_get_current_ma(), telemetry_get_battery_mv());
         if (len < 0 || len >= sizeof(row)) {
             len = sizeof(row) - 1;
             DebugPrint("Failed to write; weird len returned. %d", len);
