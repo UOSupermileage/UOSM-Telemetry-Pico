@@ -4,13 +4,6 @@
 
 #include "LoggingTask.h"
 
-//
-// Created by Jeremy Cote on 2024-07-21.
-//
-
-#include "LoggingTask.h"
-
-#include <accelerometer.h>
 #include <FreeRTOS.h>
 #include <task.h>
 #include "RTOS.h"
@@ -44,7 +37,7 @@ static char row[128];
 static uint16_t file_number = 0;
 static uint bw;
 
-void    InitLoggingTask() {
+void InitLoggingTask() {
     LoggingTaskHandle = xTaskCreateStatic(
             LoggingTask,
             "logging",
@@ -72,24 +65,26 @@ _Noreturn void LoggingTask(void* parameters) {
         snprintf(filename, sizeof(filename), "d_%d.csv", file_number);
         fr = f_open(&fil, filename, FA_READ);
 
-        f_close(&fil);
-
-
-
-        if (fr == FR_NO_FILE) {
+        if (fr == FR_OK) {
+            f_close(&fil);
+        } else if (fr == FR_NO_FILE) {
             break;
+        } else {
+            DebugPrint("Failed to probe %s: %s (fr=%d)", filename, FRESULT_str(fr), (int) fr);
+            vTaskDelay(pdMS_TO_TICKS(1000));
+            continue;
         }
 
         file_number++;
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 
-    while ((fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE)) != FR_OK && fr != FR_EXIST) {
-        DebugPrint("Failed to open %s: %s ()", filename, FRESULT_str(fr), fr);
+    while ((fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE)) != FR_OK) {
+        DebugPrint("Failed to open %s for append: %s (fr=%d)", filename, FRESULT_str(fr), (int) fr);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
-    if (fr != FR_EXIST) {
+    if (f_size(&fil) == 0) {
         f_printf(&fil, "Tick,Throttle,Speed,Current,Voltage\n");
     }
 
@@ -100,12 +95,11 @@ _Noreturn void LoggingTask(void* parameters) {
             len = sizeof(row) - 1;
             DebugPrint("Failed to write; weird len returned. %d", len);
         }
-        // fr = f_write(&fil, row, len, &bw);
 
         fr = f_write(&fil, row, len,  &bw);
 
         if (fr != FR_OK || bw != len) {
-            DebugPrint("Failed to write %s: %s ()", filename, FRESULT_str(fr), bw);
+            DebugPrint("Failed to write %s: %s bw=%u", filename, FRESULT_str(fr), (unsigned) bw);
         }
 
         static uint8_t i;
