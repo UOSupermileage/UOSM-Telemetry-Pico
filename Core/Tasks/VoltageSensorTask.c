@@ -57,6 +57,7 @@ _Noreturn void CurrentSensorTask(void* parameters) {
         uint8_t counter = 0;
         while (!voltage_sensor_is_data_ready() && counter < 20) {
             Sleep(5);
+            counter++;
         }
 
         uint32_t codes;
@@ -76,6 +77,7 @@ _Noreturn void CurrentSensorTask(void* parameters) {
         counter = 0;
         while (!voltage_sensor_is_data_ready() && counter < 20) {
             Sleep(5);
+            counter++;
         }
 
         if (voltage_sensor_read_conversion(&codes)) {

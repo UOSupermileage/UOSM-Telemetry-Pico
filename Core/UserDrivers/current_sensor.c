@@ -102,7 +102,7 @@ bool voltage_sensor_start() {
 }
 
 bool voltage_sensor_stop() {
-    return write_byte(ads1219_command_start, false);
+    return write_byte(ads1219_command_shutdown, true);
 }
 
 bool voltage_sensor_read_conversion(uint32_t* result) {
