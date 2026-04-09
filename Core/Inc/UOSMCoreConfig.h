@@ -21,7 +21,6 @@
 
 #define MCP2515_SPI_TRANSMIT(BUFFER, SIZE)    spi_write_blocking(SPI, BUFFER, SIZE)
 #define MCP2515_SPI_RECEIVE(BUFFER, SIZE)     spi_read_blocking(SPI, 0, BUFFER, SIZE)
-#define MCP2515_SPI_READY                     true
 
 #define MCP2515_CS_HIGH() gpio_put(SPI_CS, true)
 #define MCP2515_CS_LOW() gpio_put(SPI_CS, false)

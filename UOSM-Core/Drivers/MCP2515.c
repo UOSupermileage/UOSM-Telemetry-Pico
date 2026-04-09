@@ -1,5 +1,7 @@
 #include "MCP2515.h"
 
+#include "pico/stdlib.h"
+
 /* Pin 설정에 맞게 수정필요. Modify below items for your SPI configurations */
 #ifdef EXT_SPI_CAN
 extern SPI_HandleTypeDef EXT_SPI_CAN;
@@ -18,16 +20,17 @@ bool MCP2515_Initialize(void)
 
   DebugPrint("Initialized MCP2515");
 
-  uint8_t loop = 10;
+  MCP2515_Reset();
+  sleep_ms(1);
 
-  do {
-    /* SPI Ready 확인 */
-    if(MCP2515_SPI_READY) {
-    	  DebugPrint("Succeeded to init MCP");
-    	return true;
+  for (uint8_t attempt = 0; attempt < 10; attempt++) {
+    uint8_t stat = MCP2515_ReadByte(MCP2515_CANSTAT);
+    if ((stat & 0xE0) == 0x80) {
+      DebugPrint("Succeeded to init MCP");
+      return true;
     }
-    loop--;
-  } while(loop > 0);
+    sleep_ms(1);
+  }
 
   DebugPrint("Failed to init MCP");
   return false;
