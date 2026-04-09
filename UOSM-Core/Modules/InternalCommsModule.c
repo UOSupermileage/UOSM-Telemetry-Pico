@@ -97,13 +97,13 @@ void IComms_PeriodicReceive() {
         if (ICOMMS_DRIVER_RECEIVE_MESSAGE(&rxMsg) == RESULT_OK) {
             if (rxMsg.standardMessageID >= NUMBER_CAN_MESSAGE_IDS) {
                 DebugPrint("CAN: Unknown message id [%x]", rxMsg.standardMessageID);
-                return;
+                continue;
             }
 
             // Execute callback for message
             if (rxMsg.dataLength != CANMessageLookUpTable[rxMsg.standardMessageID].numberOfBytes) {
                 DebugPrint("CAN: message id [%x] has incorrect length of [%d]", rxMsg.standardMessageID, rxMsg.dataLength);
-                return;
+                continue;
             }
 
             CANMessageLookUpTable[rxMsg.standardMessageID].canMessageCallback(&rxMsg);
