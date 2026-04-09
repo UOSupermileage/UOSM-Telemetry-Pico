@@ -55,13 +55,13 @@ void SerialPrintln(const char* message, ...) {
 void SerialPrint(const char * message, ...) {
     va_list args;
     va_start(args, message);
-    ExternalSerialPrint(message, args);
+    ExternalSerialVPrint(message, args);
     va_end(args);
 }
 void SerialPrintln(const char * message, ...) {
     va_list args;
     va_start(args, message);
-    ExternalSerialPrintln(message, args);
+    ExternalSerialVPrintln(message, args);
     va_end(args);
 }
 #endif

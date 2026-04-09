@@ -5,6 +5,8 @@
 #ifndef UOSM_TELEMETRY_PICO_UOSMCORECONFIG_H
 #define UOSM_TELEMETRY_PICO_UOSMCORECONFIG_H
 
+#include <stdarg.h>
+
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
 
@@ -26,5 +28,7 @@
 
 void ExternalSerialPrint(const char* message, ...);
 void ExternalSerialPrintln(const char* message, ...);
+void ExternalSerialVPrint(const char* fmt, va_list ap);
+void ExternalSerialVPrintln(const char* fmt, va_list ap);
 
 #endif //UOSM_TELEMETRY_PICO_UOSMCORECONFIG_H

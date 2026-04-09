@@ -12,20 +12,14 @@
 /* Max content length so we can append "\n\r\0" without overrunning messageBuf. */
 #define PRINTLN_MAX_CONTENT (MAX_SERIAL_PRINT_LENGTH - 4)
 
-void ExternalSerialPrint(const char* message, ...) {
-    va_list args;
-    va_start(args, message);
-    (void) vfprintf(stdout, message, args);
-    va_end(args);
+void ExternalSerialVPrint(const char* fmt, va_list ap) {
+    (void) vfprintf(stdout, fmt, ap);
 }
 
-void ExternalSerialPrintln(const char* message, ...) {
+void ExternalSerialVPrintln(const char* fmt, va_list ap) {
     char messageBuf[MAX_SERIAL_PRINT_LENGTH];
 
-    va_list args;
-    va_start(args, message);
-    int len = vsnprintf(messageBuf, PRINTLN_MAX_CONTENT + 1, message, args);
-    va_end(args);
+    int len = vsnprintf(messageBuf, PRINTLN_MAX_CONTENT + 1, fmt, ap);
 
     if (len < 0) {
         len = 0;
@@ -36,4 +30,18 @@ void ExternalSerialPrintln(const char* message, ...) {
     messageBuf[len + 1] = '\r';
     messageBuf[len + 2] = '\0';
     (void) fputs(messageBuf, stdout);
+}
+
+void ExternalSerialPrint(const char* message, ...) {
+    va_list args;
+    va_start(args, message);
+    ExternalSerialVPrint(message, args);
+    va_end(args);
+}
+
+void ExternalSerialPrintln(const char* message, ...) {
+    va_list args;
+    va_start(args, message);
+    ExternalSerialVPrintln(message, args);
+    va_end(args);
 }
