@@ -214,8 +214,8 @@ result_t IComms_ReadPairInt32Message(iCommsMessage_t* msg, int32_t* a, int32_t* 
         return RESULT_FAIL;
     }
 
-    *a = * (int32_t*) msg->data;
-    *b = * (int32_t*) (msg->data + 4);
+    memcpy(a, msg->data, sizeof(int32_t));
+    memcpy(b, msg->data + 4, sizeof(int32_t));
 
     return RESULT_OK;
 }
