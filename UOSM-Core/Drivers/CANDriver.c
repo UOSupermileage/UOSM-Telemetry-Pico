@@ -211,7 +211,7 @@ uint8_t CANSPI_Receive(iCommsMessage_t * rxMsg)
 	/* 버퍼에 수신된 메시지가 있는지 확인 */
 	if (rxStatus.rxBuffer != 0) {
             /* 어떤 버퍼에 메시지가 있는지 확인 후 처리 */
-            if ((rxStatus.rxBuffer == MSG_IN_RXB0)|(rxStatus.rxBuffer == MSG_IN_BOTH_BUFFERS))
+            if ((rxStatus.rxBuffer == MSG_IN_RXB0) || (rxStatus.rxBuffer == MSG_IN_BOTH_BUFFERS))
             {
               MCP2515_ReadRxSequence(MCP2515_READ_RXB0SIDH, rxReg.rx_reg_array, sizeof(rxReg.rx_reg_array));
             }
